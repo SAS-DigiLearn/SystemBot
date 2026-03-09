@@ -5,8 +5,6 @@
 <meta charset="UTF-8">
 <title>Data Sheet Viewer</title>
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
 <style>
 
 body{
@@ -30,10 +28,6 @@ font-weight:bold;
 color:#b91e71;
 }
 
-.header-logo{
-height:60px;
-}
-
 .container{
 padding:25px;
 max-width:1000px;
@@ -51,7 +45,22 @@ box-shadow:0 2px 10px rgba(0,0,0,0.08);
 display:flex;
 justify-content:space-between;
 align-items:center;
+margin-bottom:20px;
+}
+
+.progress-bar{
+height:8px;
+background:#eee;
+border-radius:20px;
 margin-bottom:25px;
+overflow:hidden;
+}
+
+.progress-fill{
+height:100%;
+background:#b91e71;
+width:0%;
+transition:width 0.3s;
 }
 
 .sheet-section{
@@ -75,7 +84,7 @@ border-bottom:1px solid #eee;
 .sheet-nav{
 display:flex;
 justify-content:space-between;
-margin-top:25px;
+margin-top:30px;
 }
 
 button{
@@ -97,32 +106,13 @@ background:#ccc;
 cursor:not-allowed;
 }
 
-.progress-bar{
-height:8px;
-background:#eee;
-border-radius:20px;
-margin-top:10px;
-overflow:hidden;
-}
-
-.progress-fill{
-height:100%;
-background:#b91e71;
-width:0%;
-transition:width 0.3s;
-}
-
 </style>
 </head>
 
 <body>
 
 <header>
-
 <span class="title">Project Data Sheets</span>
-
-<img src="logo.png" class="header-logo">
-
 </header>
 
 <div class="container">
@@ -130,7 +120,7 @@ transition:width 0.3s;
 <div class="sheet-card">
 
 <div class="sheet-header">
-<h2 id="sheetTitle">Loading...</h2>
+<h2 id="sheetTitle"></h2>
 <span id="progressText"></span>
 </div>
 
@@ -151,159 +141,163 @@ transition:width 0.3s;
 
 <script>
 
-let workbook;
-let sheetNames=[];
-let currentSheetIndex=0;
+const TOTAL_SHEETS = 20
+let currentSheet = 0
 
-fetch("datasheets.xlsx")
-.then(res=>res.arrayBuffer())
-.then(data=>{
+function generatePlaceholderSheet(sheetNumber){
 
-workbook=XLSX.read(data);
+const sections = []
 
-sheetNames=workbook.SheetNames;
+for(let s=1;s<=5;s++){
 
-restoreProgress();
-
-loadSheet(currentSheetIndex);
-
-});
-
-function restoreProgress(){
-
-const saved=localStorage.getItem("sheetProgress");
-
-if(saved){
-currentSheetIndex=parseInt(saved);
+const section = {
+name:"Section " + s,
+fields:[]
 }
+
+for(let f=1;f<=5;f++){
+
+section.fields.push({
+label:"Data Field " + f,
+value:"Placeholder value for sheet "+sheetNumber
+})
 
 }
 
-function saveProgress(){
+sections.push(section)
 
-localStorage.setItem("sheetProgress",currentSheetIndex);
+}
+
+return sections
 
 }
 
 function loadSheet(index){
 
-const sheetName=sheetNames[index];
+currentSheet = index
 
-const sheet=workbook.Sheets[sheetName];
+document.getElementById("sheetTitle").textContent =
+"Data Sheet " + (index+1)
 
-const rows=XLSX.utils.sheet_to_json(sheet);
+document.getElementById("progressText").textContent =
+(index+1) + " / " + TOTAL_SHEETS
 
-document.getElementById("sheetTitle").textContent=sheetName;
+updateProgressBar()
 
-document.getElementById("progressText").textContent=
-(index+1)+" / "+sheetNames.length;
+renderSheet(generatePlaceholderSheet(index+1))
 
-updateProgressBar(index);
-
-renderSections(rows);
-
-updateButtons();
+updateButtons()
 
 }
 
-function updateProgressBar(index){
+function renderSheet(sections){
 
-const percent=((index+1)/sheetNames.length)*100;
+const container = document.getElementById("sheetContent")
+container.innerHTML = ""
 
-document.getElementById("progressFill").style.width=percent+"%";
+sections.forEach(section => {
+
+const sectionDiv = document.createElement("div")
+sectionDiv.className = "sheet-section"
+
+const title = document.createElement("div")
+title.className = "section-title"
+title.textContent = section.name
+
+sectionDiv.appendChild(title)
+
+section.fields.forEach(field => {
+
+const row = document.createElement("div")
+row.className = "data-row"
+
+row.innerHTML =
+`<span>${field.label}</span>
+<span>${field.value}</span>`
+
+sectionDiv.appendChild(row)
+
+})
+
+container.appendChild(sectionDiv)
+
+})
 
 }
 
-function renderSections(rows){
+function updateProgressBar(){
 
-const container=document.getElementById("sheetContent");
+const percent = ((currentSheet+1)/TOTAL_SHEETS)*100
 
-container.innerHTML="";
-
-const sections={};
-
-rows.forEach(row=>{
-
-if(!sections[row.Section]){
-sections[row.Section]=[];
-}
-
-sections[row.Section].push(row);
-
-});
-
-Object.keys(sections).forEach(sectionName=>{
-
-const sectionDiv=document.createElement("div");
-sectionDiv.className="sheet-section";
-
-sectionDiv.innerHTML=
-`<div class="section-title">${sectionName}</div>`;
-
-sections[sectionName].forEach(row=>{
-
-const rowDiv=document.createElement("div");
-rowDiv.className="data-row";
-
-rowDiv.innerHTML=
-`<span>${row.Label}</span>
-<span>${row.Value}</span>`;
-
-sectionDiv.appendChild(rowDiv);
-
-});
-
-container.appendChild(sectionDiv);
-
-});
+document.getElementById("progressFill").style.width =
+percent + "%"
 
 }
 
 function updateButtons(){
 
-const progress=
-parseInt(localStorage.getItem("sheetProgress")||0);
+const progress =
+parseInt(localStorage.getItem("sheetProgress") || 0)
 
-document.getElementById("prevBtn").disabled=
-currentSheetIndex===0;
+document.getElementById("prevBtn").disabled =
+currentSheet === 0
 
-document.getElementById("nextBtn").disabled=
-currentSheetIndex>progress;
+document.getElementById("nextBtn").disabled =
+currentSheet > progress
+
+}
+
+function saveProgress(){
+
+localStorage.setItem("sheetProgress",currentSheet)
 
 }
 
 document.getElementById("nextBtn").addEventListener("click",()=>{
 
-const progress=
-parseInt(localStorage.getItem("sheetProgress")||0);
+const progress =
+parseInt(localStorage.getItem("sheetProgress") || 0)
 
-if(currentSheetIndex>=progress){
-saveProgress();
+if(currentSheet >= progress){
+saveProgress()
 }
 
-if(currentSheetIndex<sheetNames.length-1){
+if(currentSheet < TOTAL_SHEETS-1){
 
-currentSheetIndex++;
+currentSheet++
 
-saveProgress();
+saveProgress()
 
-loadSheet(currentSheetIndex);
+loadSheet(currentSheet)
 
 }
 
-});
+})
 
 document.getElementById("prevBtn").addEventListener("click",()=>{
 
-if(currentSheetIndex>0){
+if(currentSheet>0){
 
-currentSheetIndex--;
+currentSheet--
 
-loadSheet(currentSheetIndex);
+loadSheet(currentSheet)
 
 }
 
-});
+})
+
+function restoreProgress(){
+
+const saved =
+parseInt(localStorage.getItem("sheetProgress") || 0)
+
+currentSheet = saved
+
+}
+
+restoreProgress()
+
+loadSheet(currentSheet)
 
 </script>
 
