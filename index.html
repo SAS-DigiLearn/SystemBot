@@ -165,7 +165,7 @@ padding-bottom:10px;
 
 <header>
 <span class="title">Project Data Sheets</span>
-  <img src="logo.png" class="header-logo">
+<img src="logo.png" class="header-logo">
 </header>
 
 <div class="container">
@@ -311,31 +311,21 @@ percent + "%"
 
 function updateButtons(){
 
-const progress =
-parseInt(localStorage.getItem("sheetProgress") || 0)
-
 document.getElementById("prevBtn").disabled =
 currentSheet === 0
 
 document.getElementById("nextBtn").disabled =
-currentSheet > progress
+currentSheet === TOTAL_SHEETS - 1
 
 }
 
 function saveProgress(){
 
-localStorage.setItem("sheetProgress",currentSheet)
+localStorage.setItem("lastVisitedSheet",currentSheet)
 
 }
 
 document.getElementById("nextBtn").addEventListener("click",()=>{
-
-const progress =
-parseInt(localStorage.getItem("sheetProgress") || 0)
-
-if(currentSheet >= progress){
-saveProgress()
-}
 
 if(currentSheet < TOTAL_SHEETS-1){
 
@@ -354,6 +344,8 @@ document.getElementById("prevBtn").addEventListener("click",()=>{
 if(currentSheet>0){
 
 currentSheet--
+
+saveProgress()
 
 loadSheet(currentSheet)
 
@@ -402,7 +394,7 @@ allExpanded ? "Collapse All" : "Expand All"
 function restoreProgress(){
 
 const saved =
-parseInt(localStorage.getItem("sheetProgress") || 0)
+parseInt(localStorage.getItem("lastVisitedSheet") || 0)
 
 currentSheet = saved
 
