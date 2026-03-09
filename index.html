@@ -110,6 +110,34 @@ background:#ccc;
 cursor:not-allowed;
 }
 
+.section-title{
+font-size:16px;
+font-weight:bold;
+color:#b91e71;
+margin-bottom:10px;
+cursor:pointer;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.section-content{
+display:none;
+}
+
+.section-title::after{
+content:"+";
+font-weight:bold;
+}
+
+.section-title.active::after{
+content:"−";
+}
+
+.section-content.open{
+display:block;
+}
+
 </style>
 </head>
 
@@ -200,7 +228,7 @@ function renderSheet(sections){
 const container = document.getElementById("sheetContent")
 container.innerHTML = ""
 
-sections.forEach(section => {
+sections.forEach((section, index) => {
 
 const sectionDiv = document.createElement("div")
 sectionDiv.className = "sheet-section"
@@ -209,7 +237,15 @@ const title = document.createElement("div")
 title.className = "section-title"
 title.textContent = section.name
 
-sectionDiv.appendChild(title)
+const content = document.createElement("div")
+content.className = "section-content"
+
+title.addEventListener("click", () => {
+
+title.classList.toggle("active")
+content.classList.toggle("open")
+
+})
 
 section.fields.forEach(field => {
 
@@ -220,9 +256,12 @@ row.innerHTML =
 `<span>${field.label}</span>
 <span>${field.value}</span>`
 
-sectionDiv.appendChild(row)
+content.appendChild(row)
 
 })
+
+sectionDiv.appendChild(title)
+sectionDiv.appendChild(content)
 
 container.appendChild(sectionDiv)
 
