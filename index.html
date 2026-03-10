@@ -75,7 +75,31 @@ margin-bottom:25px;
 font-size:16px;
 font-weight:bold;
 color:#b91e71;
-margin-bottom:10px;
+padding:14px 18px;
+cursor:pointer;
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:white;
+margin-bottom:0;
+width:100%;
+border:none;
+text-align:left;
+}
+
+.section-title::after{
+content:"+";
+font-size:18px;
+transition:transform 0.25s;
+}
+
+.section-title.active::after{
+content:"−";
+}
+
+.section-title:focus{
+outline:3px solid #b91e71;
+outline-offset:2px;
 }
 
 .data-row{
@@ -121,29 +145,6 @@ transition:box-shadow 0.2s ease;
 
 .sheet-section:hover{
 box-shadow:0 4px 12px rgba(0,0,0,0.05);
-}
-
-.section-title{
-font-size:16px;
-font-weight:bold;
-color:#b91e71;
-padding:14px 18px;
-cursor:pointer;
-display:flex;
-justify-content:space-between;
-align-items:center;
-background:white;
-margin-bottom:0;
-}
-
-.section-title::after{
-content:"+";
-font-size:18px;
-transition:transform 0.25s;
-}
-
-.section-title.active::after{
-content:"−";
 }
 
 .section-content{
@@ -229,6 +230,28 @@ return sections
 
 }
 
+function toggleSection(title,content){
+
+const isOpen = content.style.maxHeight
+
+if(isOpen){
+
+content.style.maxHeight = null
+content.classList.remove("open")
+title.classList.remove("active")
+title.setAttribute("aria-expanded","false")
+
+}else{
+
+content.style.maxHeight = content.scrollHeight + "px"
+content.classList.add("open")
+title.classList.add("active")
+title.setAttribute("aria-expanded","true")
+
+}
+
+}
+
 function loadSheet(index){
 
 currentSheet = index
@@ -257,25 +280,20 @@ sections.forEach((section, index) => {
 const sectionDiv = document.createElement("div")
 sectionDiv.className = "sheet-section"
 
-const title = document.createElement("div")
+const contentId = "section-content-" + index
+
+const title = document.createElement("button")
 title.className = "section-title"
 title.textContent = section.name
+title.setAttribute("aria-expanded","false")
+title.setAttribute("aria-controls",contentId)
 
 const content = document.createElement("div")
 content.className = "section-content"
+content.id = contentId
 
 title.addEventListener("click", () => {
-
-title.classList.toggle("active")
-
-if(content.style.maxHeight){
-content.style.maxHeight = null
-content.classList.remove("open")
-}else{
-content.style.maxHeight = content.scrollHeight + "px"
-content.classList.add("open")
-}
-
+toggleSection(title,content)
 })
 
 section.fields.forEach(field => {
@@ -371,12 +389,14 @@ const content = contents[i]
 if(allExpanded){
 
 title.classList.add("active")
+title.setAttribute("aria-expanded","true")
 content.classList.add("open")
 content.style.maxHeight = content.scrollHeight + "px"
 
 }else{
 
 title.classList.remove("active")
+title.setAttribute("aria-expanded","false")
 content.classList.remove("open")
 content.style.maxHeight = null
 
