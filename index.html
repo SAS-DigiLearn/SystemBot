@@ -200,9 +200,44 @@ padding-bottom:10px;
 <script>
 
 const TOTAL_SHEETS = 20
-let currentSheet = 0
+const VERSIONS_PER_SHEET = 6
 
-function generatePlaceholderSheet(sheetNumber){
+let currentSheet = 0
+let sheetVersions = []
+
+function generateRandomVersions(){
+
+for(let i=0;i<TOTAL_SHEETS;i++){
+
+sheetVersions[i] =
+Math.floor(Math.random() * VERSIONS_PER_SHEET)
+
+}
+
+localStorage.setItem(
+"sheetVersions",
+JSON.stringify(sheetVersions)
+)
+
+}
+
+function loadVersions(){
+
+const saved = localStorage.getItem("sheetVersions")
+
+if(saved){
+
+sheetVersions = JSON.parse(saved)
+
+}else{
+
+generateRandomVersions()
+
+}
+
+}
+
+function generatePlaceholderSheet(sheetNumber,version){
 
 const sections = []
 
@@ -217,7 +252,7 @@ for(let f=1;f<=5;f++){
 
 section.fields.push({
 label:"Data Field " + f,
-value:"Placeholder value for sheet "+sheetNumber
+value:"Placeholder value for sheet "+sheetNumber+" version "+(version+1)
 })
 
 }
@@ -264,7 +299,9 @@ document.getElementById("progressText").textContent =
 
 updateProgressBar()
 
-renderSheet(generatePlaceholderSheet(index+1))
+const version = sheetVersions[index]
+
+renderSheet(generatePlaceholderSheet(index+1,version))
 
 updateButtons()
 
@@ -421,7 +458,7 @@ currentSheet = saved
 }
 
 restoreProgress()
-
+loadVersions()
 loadSheet(currentSheet)
 
 </script>
