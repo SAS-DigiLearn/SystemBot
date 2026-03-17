@@ -266,6 +266,38 @@ const COLUMN_MAP = {
     { label: "Weight", index: 12 },
     { label: "Height", index: 13 }
   ]
+   Patient Needs Assessment: [
+    { label: "PNAPatient", index: 14 },
+    { label: "PNAHB", index: 15 },
+    { label: "PNAACC", index: 16 },
+    { label: "PNAACCESS", index: 17 },
+    { label: "PNA Notes", index: 18 },
+    { label: "PNA Answer 1", index: 19 },
+    { label: "PNA Answer 2", index: 20 },
+    { label: "PNA Answer 3", index: 21 },
+    { label: "PNA Answer 4", index: 22 },
+    { label: "PNA Answer 5", index: 23 },
+    { label: "PNA Answer 6", index: 24 },
+    { label: "PNA Answer 7", index: 25 },
+    { label: "PNA Answer 8", index: 26 },
+    { label: "PNA Answer 9", index: 27 },
+    { label: "PNA Answer 10", index: 28 },
+    { label: "PNA Answer 11", index: 29 },
+    { label: "PNA Answer 12", index: 30 },
+    { label: "PNA Answer 13", index: 31 },
+    { label: "PNA Answer 14", index: 32 },
+    { label: "PNA Answer 15", index: 33 },
+    { label: "PNA Answer 16", index: 34 },
+    { label: "PNA Answer 17", index: 35 },
+    { label: "PNA Answer 18", index: 36 },
+    { label: "PNA Answer 19", index: 37 },
+    { label: "PNA Answer 20", index: 38 },
+    { label: "Appeal", index: 39 },
+    { label: "Eligible", index: 40 },
+    { label: "Ineligible", index: 41 },
+    { label: "Reason", index: 42 },
+    { label: "PNA Additional Notes", index: 43 }
+  ]
 }
 
 let SHEET_DATA = {}
@@ -286,6 +318,14 @@ function mapRowToSections(row, sheetNumber){
   return [
     {
       name: "Personal Info",
+      layout: "grid",
+      fields: COLUMN_MAP.personal.map(col => ({
+        label: col.label,
+        value: formatValue(row[col.index])
+      }))
+    },
+    {
+      name: "Patient Needs Assessment",
       layout: "grid",
       fields: COLUMN_MAP.personal.map(col => ({
         label: col.label,
