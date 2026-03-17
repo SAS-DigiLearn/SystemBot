@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <title>Data Sheet Viewer</title>
 
@@ -206,8 +205,6 @@ background:#fafafa;
 .section-content.open{
 padding-bottom:10px;
 }
-
-
 </style>
 </head>
 
@@ -231,9 +228,6 @@ padding-bottom:10px;
 <button id="toggleAllBtn">Expand All</button>
 </div>
 
-<!-- NEW: Excel Upload -->
-<input type="file" id="excelUpload" accept=".xlsx,.xls" style="margin-bottom:15px;">
-
 <div class="progress-bar">
 <div class="progress-fill" id="progressFill"></div>
 </div>
@@ -250,7 +244,6 @@ padding-bottom:10px;
 </div>
 
 <script>
-
 const TOTAL_SHEETS = 20
 let currentSheet = 0
 
@@ -290,193 +283,158 @@ function formatValue(value){
    STEP 2: MAP ROW → SECTIONS
 ========================= */
 function mapRowToSections(row, sheetNumber){
-
-return [
-
-{
-  name: "Personal Info",
-  layout: "grid",
-  fields: COLUMN_MAP.personal.map(col => ({
-    label: col.label,
-    value: formatValue(row[col.index])
-  }))
-}
-
-]
-
+  return [
+    {
+      name: "Personal Info",
+      layout: "grid",
+      fields: COLUMN_MAP.personal.map(col => ({
+        label: col.label,
+        value: formatValue(row[col.index])
+      }))
+    }
+  ]
 }
 
 /* =========================
-   STEP 4: EXCEL PARSING
+   STEP 4: FETCH EXCEL FROM GIT
 ========================= */
-document.getElementById("excelUpload").addEventListener("change", function(e){
+const DATA_URL = "https://raw.githubusercontent.com/SAS-DigiLearn/SystemBot/tree/main/data/Testing Exercise Data.xlsx";
 
-const file = e.target.files[0]
-const reader = new FileReader()
+fetch(DATA_URL)
+  .then(res => res.arrayBuffer())
+  .then(buffer => {
+    const data = new Uint8Array(buffer);
+    const workbook = XLSX.read(data, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-reader.onload = function(evt){
+    SHEET_DATA = {};
 
-const data = new Uint8Array(evt.target.result)
-const workbook = XLSX.read(data, { type: "array" })
+    json.forEach(row => {
+      const sheetNumber = row[0];
+      if(!sheetNumber) return;
+      SHEET_DATA[sheetNumber] = mapRowToSections(row, sheetNumber);
+    });
 
-const sheet = workbook.Sheets[workbook.SheetNames[0]]
-
-/* IMPORTANT: header:1 gives raw arrays */
-const json = XLSX.utils.sheet_to_json(sheet, { header: 1 })
-
-SHEET_DATA = {}
-
-json.forEach(row => {
-
-const sheetNumber = row[0]
-if(!sheetNumber) return
-
-SHEET_DATA[sheetNumber] = mapRowToSections(row, sheetNumber)
-
-})
-
-loadSheet(0)
-
-}
-
-reader.readAsArrayBuffer(file)
-
-})
+    loadSheet(0);
+  })
+  .catch(err => console.error("Failed to load Excel file:", err));
 
 /* =========================
    STEP 5: USE DATA
 ========================= */
 function generatePlaceholderSheet(sheetNumber){
-
-return SHEET_DATA[sheetNumber] || [
-  {
-    name: "Empty",
-    fields: [{ label: "Info", value: "No data loaded" }]
-  }
-]
-
+  return SHEET_DATA[sheetNumber] || [
+    {
+      name: "Empty",
+      fields: [{ label: "Info", value: "No data loaded" }]
+    }
+  ]
 }
 
 /* =========================
    EXISTING FUNCTIONS (UNCHANGED)
 ========================= */
-
 function toggleSection(title,content){
-const isOpen = content.style.maxHeight
+  const isOpen = content.style.maxHeight
 
-if(isOpen){
-content.style.maxHeight = null
-content.classList.remove("open")
-title.classList.remove("active")
-title.setAttribute("aria-expanded","false")
-}else{
-content.style.maxHeight = content.scrollHeight + "px"
-content.classList.add("open")
-title.classList.add("active")
-title.setAttribute("aria-expanded","true")
-}
+  if(isOpen){
+    content.style.maxHeight = null
+    content.classList.remove("open")
+    title.classList.remove("active")
+    title.setAttribute("aria-expanded","false")
+  }else{
+    content.style.maxHeight = content.scrollHeight + "px"
+    content.classList.add("open")
+    title.classList.add("active")
+    title.setAttribute("aria-expanded","true")
+  }
 }
 
 function loadSheet(index){
+  currentSheet = index
 
-currentSheet = index
+  document.getElementById("sheetTitle").textContent =
+    "Exercise " + (index+1)
 
-document.getElementById("sheetTitle").textContent =
-"Exercise " + (index+1)
+  document.getElementById("progressText").textContent =
+    (index+1) + " / " + TOTAL_SHEETS
 
-document.getElementById("progressText").textContent =
-(index+1) + " / " + TOTAL_SHEETS
-
-updateProgressBar()
-
-renderSheet(generatePlaceholderSheet(index+1))
-
-updateButtons()
-
+  updateProgressBar()
+  renderSheet(generatePlaceholderSheet(index+1))
+  updateButtons()
 }
 
 function renderSheet(sections){
+  const container = document.getElementById("sheetContent")
+  container.innerHTML = ""
 
-const container = document.getElementById("sheetContent")
-container.innerHTML = ""
+  sections.forEach((section, index) => {
+    const sectionDiv = document.createElement("div")
+    sectionDiv.className = "sheet-section"
 
-sections.forEach((section, index) => {
+    const contentId = "section-content-" + index
 
-const sectionDiv = document.createElement("div")
-sectionDiv.className = "sheet-section"
+    const title = document.createElement("button")
+    title.className = "section-title"
+    title.textContent = section.name
+    title.setAttribute("aria-expanded","false")
+    title.setAttribute("aria-controls",contentId)
 
-const contentId = "section-content-" + index
+    const content = document.createElement("div")
+    content.className = "section-content"
+    content.id = contentId
 
-const title = document.createElement("button")
-title.className = "section-title"
-title.textContent = section.name
-title.setAttribute("aria-expanded","false")
-title.setAttribute("aria-controls",contentId)
+    if(section.layout === "grid"){
+      content.classList.add("grid")
+    }
 
-const content = document.createElement("div")
-content.className = "section-content"
-content.id = contentId
+    title.addEventListener("click", () => {
+      toggleSection(title,content)
+    })
 
-if(section.layout === "grid"){
-  content.classList.add("grid")
-}
+    section.fields.forEach(field => {
+      const row = document.createElement("div")
+      if(section.layout === "grid"){
+        row.className = "data-row grid"
+      }else{
+        row.className = "data-row"
+      }
+      row.innerHTML =
+        `<span>${field.label}</span>
+         <span>${field.value}</span>`
+      content.appendChild(row)
+    })
 
-title.addEventListener("click", () => {
-toggleSection(title,content)
-})
-
-section.fields.forEach(field => {
-
-const row = document.createElement("div")
-
-if(section.layout === "grid"){
-  row.className = "data-row grid"
-}else{
-  row.className = "data-row"
-}
-
-row.innerHTML =
-`<span>${field.label}</span>
-<span>${field.value}</span>`
-
-content.appendChild(row)
-
-})
-
-sectionDiv.appendChild(title)
-sectionDiv.appendChild(content)
-
-container.appendChild(sectionDiv)
-
-})
-
+    sectionDiv.appendChild(title)
+    sectionDiv.appendChild(content)
+    container.appendChild(sectionDiv)
+  })
 }
 
 function updateProgressBar(){
-const percent = ((currentSheet+1)/TOTAL_SHEETS)*100
-document.getElementById("progressFill").style.width = percent + "%"
+  const percent = ((currentSheet+1)/TOTAL_SHEETS)*100
+  document.getElementById("progressFill").style.width = percent + "%"
 }
 
 function updateButtons(){
-document.getElementById("prevBtn").disabled = currentSheet === 0
-document.getElementById("nextBtn").disabled = currentSheet === TOTAL_SHEETS - 1
+  document.getElementById("prevBtn").disabled = currentSheet === 0
+  document.getElementById("nextBtn").disabled = currentSheet === TOTAL_SHEETS - 1
 }
 
 document.getElementById("nextBtn").addEventListener("click",()=>{
-if(currentSheet < TOTAL_SHEETS-1){
-currentSheet++
-loadSheet(currentSheet)
-}
+  if(currentSheet < TOTAL_SHEETS-1){
+    currentSheet++
+    loadSheet(currentSheet)
+  }
 })
 
 document.getElementById("prevBtn").addEventListener("click",()=>{
-if(currentSheet>0){
-currentSheet--
-loadSheet(currentSheet)
-}
+  if(currentSheet>0){
+    currentSheet--
+    loadSheet(currentSheet)
+  }
 })
-
-loadSheet(0)
 
 </script>
 
