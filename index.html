@@ -263,11 +263,22 @@ function generatePlaceholderSheet(sheetNumber,version){
 return [
 
 {
-  name: "Personal Info",
+  name: "Patient Details",
   layout: "two-column",
   fields: [
-    { label: "Name", value: "John Doe" },
-    { label: "Age", value: "28" },
+    { label: "CHI Number", value: "2323232" },
+    { label: "Post Code", value: "KY2 5DD" },
+    { label: "House Name/Number", value: "2" },
+    { label: "Street", value: "Main Street" },
+    { label: "District", value: "Fife" },
+    { label: "Town/City", value: "Kirkcaldy" },
+    { label: "Title", value: "Mr" },
+    { label: "Surname", value: "Doe" },
+    { label: "Forename", value: "John" },
+    { label: "DOB", value: "2/2/99" },
+    { label: "Telephone Number", value: "01592 434343" },
+    { label: "Weight", value: "400lbs" },
+    { label: "Height", value: "4ft 3" },
     { label: "Sheet", value: sheetNumber }
   ]
 },
