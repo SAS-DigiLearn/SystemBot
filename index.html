@@ -327,7 +327,7 @@ function mapRowToSections(row, sheetNumber){
     {
       name: "Patient Needs Assessment",
       layout: "grid",
-      fields: COLUMN_MAP.personal.map(col => ({
+      fields: COLUMN_MAP["Patient Needs Assessment"].map(col => ({
         label: col.label,
         value: formatValue(row[col.index])
       }))
