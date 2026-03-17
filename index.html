@@ -284,7 +284,7 @@ return [
 },
 
 {
-  name: "Training Details",
+  name: "Patient Needs Assessment",
   layout: "stacked",
   fields: [
     { label: "Course", value: "PTS" },
@@ -293,7 +293,7 @@ return [
 },
 
 {
-  name: "Assessment",
+  name: "Journey Details",
   layout: "highlight",
   fields: [
     { label: "Score", value: "85%" },
@@ -302,12 +302,12 @@ return [
 },
 
 {
-  name: "Notes",
-  customRender: () => `
-    <textarea style="width:100%;height:80px;">
-Editable notes here...
-    </textarea>
-  `
+  name: "Requestee Details",
+  layout: "stacked",
+  fields: [
+    { label: "Course", value: "PTS" },
+    { label: "Version", value: version + 1 }
+  ]
 }
 
 ]
