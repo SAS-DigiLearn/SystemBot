@@ -109,6 +109,26 @@ padding:8px 0;
 border-bottom:1px solid #eee;
 }
 
+/* NEW: layout variations */
+.data-row.two-column{
+justify-content: space-between;
+font-weight: 500;
+}
+
+.data-row.highlight{
+background:#fff0f6;
+padding:10px;
+border-radius:6px;
+margin-bottom:6px;
+border:none;
+}
+
+.data-row.minimal{
+border:none;
+padding:4px 0;
+color:#666;
+}
+
 .sheet-nav{
 display:flex;
 justify-content:space-between;
@@ -237,31 +257,49 @@ generateRandomVersions()
 
 }
 
+/* UPDATED: fully configurable sections */
 function generatePlaceholderSheet(sheetNumber,version){
 
-const sections = []
+return [
 
-for(let s=1;s<=4;s++){
+{
+  name: "Personal Info",
+  layout: "two-column",
+  fields: [
+    { label: "Name", value: "John Doe" },
+    { label: "Age", value: "28" },
+    { label: "Sheet", value: sheetNumber }
+  ]
+},
 
-const section = {
-name:"Section " + s,
-fields:[]
+{
+  name: "Training Details",
+  layout: "stacked",
+  fields: [
+    { label: "Course", value: "PTS" },
+    { label: "Version", value: version + 1 }
+  ]
+},
+
+{
+  name: "Assessment",
+  layout: "highlight",
+  fields: [
+    { label: "Score", value: "85%" },
+    { label: "Status", value: "Pass" }
+  ]
+},
+
+{
+  name: "Notes",
+  customRender: () => `
+    <textarea style="width:100%;height:80px;">
+Editable notes here...
+    </textarea>
+  `
 }
 
-for(let f=1;f<=4;f++){
-
-section.fields.push({
-label:"Data Field " + f,
-value:"Placeholder value for sheet "+sheetNumber+" version "+(version+1)
-})
-
-}
-
-sections.push(section)
-
-}
-
-return sections
+]
 
 }
 
@@ -333,10 +371,28 @@ title.addEventListener("click", () => {
 toggleSection(title,content)
 })
 
+/* NEW: custom render support */
+if(section.customRender){
+  content.innerHTML = section.customRender()
+}else{
+
 section.fields.forEach(field => {
 
 const row = document.createElement("div")
-row.className = "data-row"
+
+/* NEW: layout handling */
+if(section.layout === "two-column"){
+  row.className = "data-row two-column"
+}
+else if(section.layout === "highlight"){
+  row.className = "data-row highlight"
+}
+else if(section.layout === "minimal"){
+  row.className = "data-row minimal"
+}
+else{
+  row.className = "data-row"
+}
 
 row.innerHTML =
 `<span>${field.label}</span>
@@ -345,6 +401,8 @@ row.innerHTML =
 content.appendChild(row)
 
 })
+
+}
 
 sectionDiv.appendChild(title)
 sectionDiv.appendChild(content)
