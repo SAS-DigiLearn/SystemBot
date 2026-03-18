@@ -331,40 +331,33 @@ function mapRowToSections(row, sheetNumber){
       layout: "grid",
       groups: [
         {
-          name: "Medical",
+          name: "CHI",
           fields: [
-            { label: "CHI Number", value: formatValue(row[1]) },
+            { label: "CHI Number", value: formatValue(row[1]) }
+          ]
+        },
+        {
+          name: "Personal",
+          fields: [
+            { label: "Title", value: formatValue(row[7]) },
+            { label: "Forename", value: formatValue(row[9]) },
+            { label: "Surname", value: formatValue(row[8]) },
+            { label: "DOB", value: formatValue(row[10]) },
             { label: "Weight", value: formatValue(row[12]) },
             { label: "Height", value: formatValue(row[13]) }
           ]
         },
         {
-          name: "Name",
-          fields: [
-            { label: "Title", value: formatValue(row[7]) },
-            { label: "Forename", value: formatValue(row[9]) },
-            { label: "Surname", value: formatValue(row[8]) },
-            { label: "DOB", value: formatValue(row[10]) }
-          ]
-        },
-        {
-          name: "Address",
+          name: "Address and Contact",
           fields: [
             { label: "House Name/Number", value: formatValue(row[3]) },
             { label: "Street", value: formatValue(row[4]) },
             { label: "District", value: formatValue(row[5]) },
             { label: "Town/City", value: formatValue(row[6]) },
-            { label: "Post Code", value: formatValue(row[2]) }
+            { label: "Post Code", value: formatValue(row[2]) },
+            { label: "Telephone Number", value: formatValue(row[11]) }
           ]
         },
-        {
-          name: "Contact",
-          fields: [
-          { label: "Telephone Number", value: formatValue(row[11]) }
-          ]
-        }
-      ]
-    },
     {
       name: "Patient Needs Assessment",
       layout: "grid",
