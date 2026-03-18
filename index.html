@@ -384,7 +384,7 @@ function mapRowToSections(row, sheetNumber){
           name: "Test",
           fields: [
             { label: "PNAPatient", value: formatValue(row[14]) },
-             { label: "PNAHB", value: formatValue(row[15]) },
+            { label: "PNAHB", value: formatValue(row[15]) },
             { label: "PNAACC", value: formatValue(row[16]) },
             { label: "PNAACCESS", value: formatValue(row[17]) },
             { label: "PNA Notes", value: formatValue(row[18]) }
@@ -415,16 +415,18 @@ function mapRowToSections(row, sheetNumber){
             { label: "PNA Answer 20", value: formatValue(row[38]) }
           ]
         },
-          {
-          name: "PNA Additonal",
+        {
+          name: "PNA Additional",
           fields: [
             { label: "Appeal", value: formatValue(row[39]) },
             { label: "Eligible", value: formatValue(row[40]) },
-            { label: "Ineligibl", value: formatValue(row[41]) },
+            { label: "Ineligible", value: formatValue(row[41]) },
             { label: "Reason", value: formatValue(row[42]) },
             { label: "PNA Additional Notes", value: formatValue(row[43]) }
-             ]
+          ]
         }
+      ]
+    }
   ]
 }
 /* =========================
