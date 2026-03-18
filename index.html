@@ -373,7 +373,9 @@ function mapRowToSections(row, sheetNumber){
             { label: "Post Code", value: formatValue(row[2]) },
             { label: "Telephone Number", value: formatValue(row[11]) }
           ]
-        },
+        }
+      ]
+    },
     {
       name: "Patient Needs Assessment",
       layout: "grid",
@@ -384,7 +386,6 @@ function mapRowToSections(row, sheetNumber){
     }
   ]
 }
-
 /* =========================
    STEP 4: FETCH EXCEL FROM GIT
 ========================= */
@@ -475,116 +476,78 @@ function renderSheet(sections){
     content.className = "section-content"
     content.id = contentId
 
-   if(section.groups){
-  section.groups.forEach(group => {
-
-    // 🔹 GROUP WRAPPER
-    const groupDiv = document.createElement("div")
-    groupDiv.className = "group-block"
-
-    // 🔹 TITLE
-    const groupTitle = document.createElement("div")
-    groupTitle.className = "group-title"
-    groupTitle.textContent = group.name
-
-    // 🔹 CONTENT WRAPPER
-    const groupContent = document.createElement("div")
-    groupContent.className = "group-content"
-
-    if(section.layout === "grid"){
-      groupContent.classList.add("grid")
-    }
-
-    // 🔹 FIELDS
-    group.fields.forEach(field => {
-      const row = document.createElement("div")
-
-      if(section.layout === "grid"){
-        row.className = "data-row grid"
-      }else{
-        row.className = "data-row"
-      }
-
-      row.innerHTML = `
-        <span>${field.label}</span>
-        <span>${field.value}</span>
-      `
-
-      groupContent.appendChild(row)
-    })
-
-    // 🔹 BUILD GROUP
-    groupDiv.appendChild(groupTitle)
-    groupDiv.appendChild(groupContent)
-    content.appendChild(groupDiv)
-  })
-} else {
-  section.fields.forEach(field => {
-    const row = document.createElement("div")
-
-    if(section.layout === "grid"){
-      row.className = "data-row grid"
-    }else{
-      row.className = "data-row"
-    }
-
-    row.innerHTML = `
-      <span>${field.label}</span>
-      <span>${field.value}</span>
-    `
-
-    content.appendChild(row)
-  })
-}
-
     title.addEventListener("click", () => {
       toggleSection(title,content)
     })
 
-   if(section.groups){
-  section.groups.forEach(group => {
+    // ✅ ONLY ONE RENDER BLOCK
+    if(section.groups){
+      section.groups.forEach(group => {
 
-    const groupTitle = document.createElement("div")
-    groupTitle.className = "group-title"
-    groupTitle.textContent = group.name
+        const groupDiv = document.createElement("div")
+        groupDiv.className = "group-block"
 
-    content.appendChild(groupTitle)
+        const groupTitle = document.createElement("div")
+        groupTitle.className = "group-title"
+        groupTitle.textContent = group.name
 
-    group.fields.forEach(field => {
-      const row = document.createElement("div")
+        const groupContent = document.createElement("div")
+        groupContent.className = "group-content"
+
+        if(section.layout === "grid"){
+          groupContent.classList.add("grid")
+        }
+
+        group.fields.forEach(field => {
+          const row = document.createElement("div")
+
+          if(section.layout === "grid"){
+            row.className = "data-row grid"
+          }else{
+            row.className = "data-row"
+          }
+
+          row.innerHTML = `
+            <span>${field.label}</span>
+            <span>${field.value}</span>
+          `
+
+          groupContent.appendChild(row)
+        })
+
+        groupDiv.appendChild(groupTitle)
+        groupDiv.appendChild(groupContent)
+        content.appendChild(groupDiv)
+      })
+
+    } else {
+
+      // fallback for non-grouped sections
+      const groupContent = document.createElement("div")
 
       if(section.layout === "grid"){
-        row.className = "data-row grid"
-      }else{
-        row.className = "data-row"
+        groupContent.classList.add("grid")
       }
 
-      row.innerHTML = `
-        <span>${field.label}</span>
-        <span>${field.value}</span>
-      `
+      section.fields.forEach(field => {
+        const row = document.createElement("div")
 
-      content.appendChild(row)
-    })
-  })
-} else {
-  section.fields.forEach(field => {
-    const row = document.createElement("div")
+        if(section.layout === "grid"){
+          row.className = "data-row grid"
+        }else{
+          row.className = "data-row"
+        }
 
-    if(section.layout === "grid"){
-      row.className = "data-row grid"
-    }else{
-      row.className = "data-row"
+        row.innerHTML = `
+          <span>${field.label}</span>
+          <span>${field.value}</span>
+        `
+
+        groupContent.appendChild(row)
+      })
+
+      content.appendChild(groupContent)
     }
-
-    row.innerHTML = `
-      <span>${field.label}</span>
-      <span>${field.value}</span>
-    `
-
-    content.appendChild(row)
-  })
-}
 
     sectionDiv.appendChild(title)
     sectionDiv.appendChild(content)
