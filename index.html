@@ -406,6 +406,14 @@ const COLUMN_MAP = {
     { label: "Patient Note", index: 99 },
     { label: "Journey Note", index: 100 },
     { label: "Private Note", index: 101 }
+  ],
+  
+  "Requestee Details": [
+    { label: "Pin No", index: 102 },
+    { label: "Requestee Type", index: 103 },
+    { label: "Requestee Name", index: 104 },
+    { label: "Requestee Tel No", index: 105 },
+    { label: "Callers Name", index: 106 }
   ]
 }
 
@@ -622,6 +630,22 @@ function mapRowToSections(row, sheetNumber){
             { label: "Patient Note", value: formatValue(row[99]) },
             { label: "Journey Note", value: formatValue(row[100]) },
             { label: "Private Note", value: formatValue(row[101]) }
+          ]
+        }
+      ]
+    },
+     {
+      name: "Requestee Details",
+      layout: "grid",
+      groups: [
+        {
+          name: "Test",
+          fields: [
+            { label: "PNAPatient", value: formatValue(row[14]) },
+            { label: "PNAHB", value: formatValue(row[15]) },
+            { label: "PNAACC", value: formatValue(row[16]) },
+            { label: "PNAACCESS", value: formatValue(row[17]) },
+            { label: "PNA Notes", value: formatValue(row[18]) }
           ]
         }
       ]
