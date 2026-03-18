@@ -426,6 +426,14 @@ function isCheckboxValue(value){
   return ["ý","o","1","0",1,0,true,false,"TRUE","FALSE","Yes","No"].includes(value)
 }
 
+function isEmpty(value){
+  return (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    (typeof value === "string" && value.trim() === "")
+  )
+}
 /* =========================
    STEP 3: VALUE FORMATTER (UPDATED)
 ========================= */
@@ -768,34 +776,39 @@ function renderSheet(sections){
           groupContent.classList.add("grid")
         }
 
-        group.fields.forEach(field => {
-          const row = document.createElement("div")
+       group.fields.forEach(field => {
 
-          if(section.layout === "grid"){
-            row.className = "data-row grid"
-          }else{
-            row.className = "data-row"
-          }
+  if(isEmpty(field.value)) return; // ✅ SKIP EMPTY
 
-      let displayValue
+  const row = document.createElement("div")
 
-if(isCheckboxValue(field.value) || typeof field.value === "boolean"){
-  displayValue = `<input type="checkbox" ${field.value ? "checked" : ""} disabled>`
-}else{
-  displayValue = field.value
+  if(section.layout === "grid"){
+    row.className = "data-row grid"
+  }else{
+    row.className = "data-row"
+  }
+
+  let displayValue
+
+  if(isCheckboxValue(field.value) || typeof field.value === "boolean"){
+    displayValue = `<input type="checkbox" ${field.value ? "checked" : ""} disabled>`
+  }else{
+    displayValue = field.value
+  }
+
+  row.innerHTML = `
+    <span>${field.label}</span>
+    <span>${displayValue}</span>
+  `
+
+  groupContent.appendChild(row)
+})
+
+       if(groupContent.children.length > 0){
+  groupDiv.appendChild(groupTitle)
+  groupDiv.appendChild(groupContent)
+  content.appendChild(groupDiv)
 }
-
-row.innerHTML = `
-  <span>${field.label}</span>
-  <span>${displayValue}</span>
-`
-
-          groupContent.appendChild(row)
-        })
-
-        groupDiv.appendChild(groupTitle)
-        groupDiv.appendChild(groupContent)
-        content.appendChild(groupDiv)
       })
 
     } else {
@@ -827,9 +840,11 @@ row.innerHTML = `
       content.appendChild(groupContent)
     }
 
-    sectionDiv.appendChild(title)
-    sectionDiv.appendChild(content)
-    container.appendChild(sectionDiv)
+  if(content.children.length > 0){
+  sectionDiv.appendChild(title)
+  sectionDiv.appendChild(content)
+  container.appendChild(sectionDiv)
+}
   })
 }
 
