@@ -574,7 +574,7 @@ function renderSheet(sections){
             row.className = "data-row"
           }
 
-        let displayValue
+      let displayValue
 
 if(isCheckboxValue(field.value) || typeof field.value === "boolean"){
   displayValue = `<input type="checkbox" ${field.value ? "checked" : ""} disabled>`
@@ -586,7 +586,6 @@ row.innerHTML = `
   <span>${field.label}</span>
   <span>${displayValue}</span>
 `
-          `
 
           groupContent.appendChild(row)
         })
