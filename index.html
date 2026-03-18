@@ -527,17 +527,38 @@ function mapRowToSections(row, sheetNumber){
       layout: "grid",
       groups: [
         {
-          name: "Test",
+          name: "Travel Details",
           fields: [
-            { label: "PNAPatient", value: formatValue(row[14]) },
-            { label: "PNAHB", value: formatValue(row[15]) },
-            { label: "PNAACC", value: formatValue(row[16]) },
-            { label: "PNAACCESS", value: formatValue(row[17]) },
-            { label: "PNA Notes", value: formatValue(row[18]) }
+            { label: "Travel Date", value: formatValue(row[44]) },
+            { label: "End Date", value: formatValue(row[45]) },
+            { label: "Reg journey", value: formatValue(row[46]) },
+            { label: "Frequency", value: formatValue(row[47]) },
+            { label: "Appt Time Mon", value: formatValue(row[48]) },
+            { label: "Appt Time Tue", value: formatValue(row[49]) },
+            { label: "Appt Time Wed", value: formatValue(row[50]) },
+            { label: "Appt Time Thur", value: formatValue(row[51]) },
+            { label: "Appt Time Fri", value: formatValue(row[52]) },
+            { label: "Appt Time Sat", value: formatValue(row[53]) },
+            { label: "Appt Time Sun", value: formatValue(row[54]) },
+            { label: "Rtn Time Mon", value: formatValue(row[55]) },
+            { label: "Rtn Time Tue", value: formatValue(row[56]) },
+            { label: "Rtn Time Wed", value: formatValue(row[57]) },
+            { label: "Rtn Time Thur", value: formatValue(row[58]) },
+            { label: "Rtn Time Fri", value: formatValue(row[59]) },
+            { label: "Rtn Time Sat", value: formatValue(row[60]) },
+            { label: "Rtn Time Sun", value: formatValue(row[61]) }
           ]
         },
         {
-          name: "PNA Answer",
+          name: "Reason for Travel",
+          fields: [
+            { label: "Medical", value: formatValue(row[62]) },
+            { label: "Social", value: formatValue(row[63]) },
+            { label: "Geo", value: formatValue(row[64]) }
+          ]
+        },
+        {
+          name: "Mobility",
           fields: [
             { label: "PNA Answer 1", value: formatValue(row[19]) },
             { label: "PNA Answer 2", value: formatValue(row[20]) },
@@ -562,7 +583,57 @@ function mapRowToSections(row, sheetNumber){
           ]
         },
         {
-          name: "PNA Additional",
+          name: "Category",
+          fields: [
+            { label: "PNA Answer 1", value: formatValue(row[19]) },
+            { label: "PNA Answer 2", value: formatValue(row[20]) },
+            { label: "PNA Answer 3", value: formatValue(row[21]) },
+            { label: "PNA Answer 4", value: formatValue(row[22]) },
+            { label: "PNA Answer 5", value: formatValue(row[23]) },
+            { label: "PNA Answer 6", value: formatValue(row[24]) },
+            { label: "PNA Answer 7", value: formatValue(row[25]) },
+            { label: "PNA Answer 8", value: formatValue(row[26]) },
+            { label: "PNA Answer 9", value: formatValue(row[27]) },
+            { label: "PNA Answer 10", value: formatValue(row[28]) },
+            { label: "PNA Answer 11", value: formatValue(row[29]) },
+            { label: "PNA Answer 12", value: formatValue(row[30]) },
+            { label: "PNA Answer 13", value: formatValue(row[31]) },
+            { label: "PNA Answer 14", value: formatValue(row[32]) },
+            { label: "PNA Answer 15", value: formatValue(row[33]) },
+            { label: "PNA Answer 16", value: formatValue(row[34]) },
+            { label: "PNA Answer 17", value: formatValue(row[35]) },
+            { label: "PNA Answer 18", value: formatValue(row[36]) },
+            { label: "PNA Answer 19", value: formatValue(row[37]) },
+            { label: "PNA Answer 20", value: formatValue(row[38]) }
+          ]
+        },
+         {
+          name: "Pick Up/Deliver",
+          fields: [
+            { label: "PNA Answer 1", value: formatValue(row[19]) },
+            { label: "PNA Answer 2", value: formatValue(row[20]) },
+            { label: "PNA Answer 3", value: formatValue(row[21]) },
+            { label: "PNA Answer 4", value: formatValue(row[22]) },
+            { label: "PNA Answer 5", value: formatValue(row[23]) },
+            { label: "PNA Answer 6", value: formatValue(row[24]) },
+            { label: "PNA Answer 7", value: formatValue(row[25]) },
+            { label: "PNA Answer 8", value: formatValue(row[26]) },
+            { label: "PNA Answer 9", value: formatValue(row[27]) },
+            { label: "PNA Answer 10", value: formatValue(row[28]) },
+            { label: "PNA Answer 11", value: formatValue(row[29]) },
+            { label: "PNA Answer 12", value: formatValue(row[30]) },
+            { label: "PNA Answer 13", value: formatValue(row[31]) },
+            { label: "PNA Answer 14", value: formatValue(row[32]) },
+            { label: "PNA Answer 15", value: formatValue(row[33]) },
+            { label: "PNA Answer 16", value: formatValue(row[34]) },
+            { label: "PNA Answer 17", value: formatValue(row[35]) },
+            { label: "PNA Answer 18", value: formatValue(row[36]) },
+            { label: "PNA Answer 19", value: formatValue(row[37]) },
+            { label: "PNA Answer 20", value: formatValue(row[38]) }
+          ]
+        },
+        {
+          name: "Notes/Requirements",
           fields: [
             { label: "Appeal", value: formatValue(row[39]) },
             { label: "Eligible", value: formatValue(row[40]) },
