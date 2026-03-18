@@ -749,8 +749,8 @@ function toggleSection(title,content){
 function loadSheet(index){
   currentSheet = index
 
- document.getElementById("sheetTitle").textContent =
-  `Exercise ${index+1} (${selectedSheetName})`
+document.getElementById("sheetTitle").textContent =
+  "Exercise " + (index+1)
 
   document.getElementById("progressText").textContent =
     (index+1) + " / " + TOTAL_SHEETS
