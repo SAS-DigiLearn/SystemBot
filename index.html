@@ -257,6 +257,14 @@ max-height:100%;
   color: #b91e71; /* pink checkmark */
 }
 
+.sheet-badge{
+  background:#eef2ff;
+  color:#4f46e5;
+  font-size:12px;
+  padding:4px 10px;
+  border-radius:20px;
+  margin-left:10px;
+}
   
 </style>
 </head>
@@ -749,8 +757,8 @@ function toggleSection(title,content){
 function loadSheet(index){
   currentSheet = index
 
-document.getElementById("sheetTitle").textContent =
-  `Exercise ${index+1} (${selectedSheetName})`
+document.getElementById("sheetTitle").innerHTML =
+  `Exercise ${index+1} <span class="sheet-badge">${selectedSheetName}</span>`
 
   document.getElementById("progressText").textContent =
     (index+1) + " / " + TOTAL_SHEETS
