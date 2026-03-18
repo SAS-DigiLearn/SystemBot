@@ -295,6 +295,7 @@ max-height:100%;
 <script>
 const TOTAL_SHEETS = 20
 let currentSheet = 0
+let selectedSheetName = "";
 
 /* =========================
    STEP 1: COLUMN MAP
@@ -691,10 +692,9 @@ fetch(DATA_URL)
 
 // Pick random sheet
 const randomIndex = Math.floor(Math.random() * sheetNames.length)
-const selectedSheetName = sheetNames[randomIndex]
+selectedSheetName = sheetNames[randomIndex]; // <- assign to the global variable
+const sheet = workbook.Sheets[selectedSheetName];
 
-// Load that sheet
-const sheet = workbook.Sheets[selectedSheetName]
 
 console.log("User assigned to sheet:", selectedSheetName)
     const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
@@ -750,7 +750,7 @@ function loadSheet(index){
   currentSheet = index
 
 document.getElementById("sheetTitle").textContent =
-  "Exercise " + (index+1)
+  `Exercise ${index+1} (${selectedSheetName})`
 
   document.getElementById("progressText").textContent =
     (index+1) + " / " + TOTAL_SHEETS
