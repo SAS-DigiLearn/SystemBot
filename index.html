@@ -331,6 +331,14 @@ function mapRowToSections(row, sheetNumber){
       layout: "grid",
       groups: [
         {
+          name: "Medical",
+          fields: [
+            { label: "CHI Number", value: formatValue(row[1]) },
+            { label: "Weight", value: formatValue(row[12]) },
+            { label: "Height", value: formatValue(row[13]) }
+          ]
+        },
+        {
           name: "Name",
           fields: [
             { label: "Title", value: formatValue(row[7]) },
@@ -350,17 +358,9 @@ function mapRowToSections(row, sheetNumber){
           ]
         },
         {
-          name: "Contact",
+          name: "Comtact",
           fields: [
-            { label: "Telephone Number", value: formatValue(row[11]) }
-          ]
-        },
-        {
-          name: "Medical",
-          fields: [
-            { label: "CHI Number", value: formatValue(row[1]) },
-            { label: "Weight", value: formatValue(row[12]) },
-            { label: "Height", value: formatValue(row[13]) }
+          { label: "Telephone Number", value: formatValue(row[11]) }
           ]
         }
       ]
