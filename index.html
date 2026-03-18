@@ -205,6 +205,16 @@ background:#fafafa;
 .section-content.open{
 padding-bottom:10px;
 }
+
+.group-title{
+  font-size:13px;
+  font-weight:bold;
+  margin-top:15px;
+  margin-bottom:5px;
+  color:#555;
+  border-bottom:1px solid #ddd;
+  padding-bottom:4px;
+}
 </style>
 </head>
 
@@ -319,10 +329,41 @@ function mapRowToSections(row, sheetNumber){
     {
       name: "Personal Info",
       layout: "grid",
-      fields: COLUMN_MAP.personal.map(col => ({
-        label: col.label,
-        value: formatValue(row[col.index])
-      }))
+      groups: [
+        {
+          name: "Name",
+          fields: [
+            { label: "Title", value: formatValue(row[7]) },
+            { label: "Forename", value: formatValue(row[9]) },
+            { label: "Surname", value: formatValue(row[8]) },
+            { label: "DOB", value: formatValue(row[10]) }
+          ]
+        },
+        {
+          name: "Address",
+          fields: [
+            { label: "House Name/Number", value: formatValue(row[3]) },
+            { label: "Street", value: formatValue(row[4]) },
+            { label: "District", value: formatValue(row[5]) },
+            { label: "Town/City", value: formatValue(row[6]) },
+            { label: "Post Code", value: formatValue(row[2]) }
+          ]
+        },
+        {
+          name: "Contact",
+          fields: [
+            { label: "Telephone Number", value: formatValue(row[11]) }
+          ]
+        },
+        {
+          name: "Medical",
+          fields: [
+            { label: "CHI Number", value: formatValue(row[1]) },
+            { label: "Weight", value: formatValue(row[12]) },
+            { label: "Height", value: formatValue(row[13]) }
+          ]
+        }
+      ]
     },
     {
       name: "Patient Needs Assessment",
@@ -433,18 +474,50 @@ function renderSheet(sections){
       toggleSection(title,content)
     })
 
-    section.fields.forEach(field => {
+   if(section.groups){
+  section.groups.forEach(group => {
+
+    const groupTitle = document.createElement("div")
+    groupTitle.className = "group-title"
+    groupTitle.textContent = group.name
+
+    content.appendChild(groupTitle)
+
+    group.fields.forEach(field => {
       const row = document.createElement("div")
+
       if(section.layout === "grid"){
         row.className = "data-row grid"
       }else{
         row.className = "data-row"
       }
-      row.innerHTML =
-        `<span>${field.label}</span>
-         <span>${field.value}</span>`
+
+      row.innerHTML = `
+        <span>${field.label}</span>
+        <span>${field.value}</span>
+      `
+
       content.appendChild(row)
     })
+  })
+} else {
+  section.fields.forEach(field => {
+    const row = document.createElement("div")
+
+    if(section.layout === "grid"){
+      row.className = "data-row grid"
+    }else{
+      row.className = "data-row"
+    }
+
+    row.innerHTML = `
+      <span>${field.label}</span>
+      <span>${field.value}</span>
+    `
+
+    content.appendChild(row)
+  })
+}
 
     sectionDiv.appendChild(title)
     sectionDiv.appendChild(content)
