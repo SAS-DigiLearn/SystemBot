@@ -560,86 +560,68 @@ function mapRowToSections(row, sheetNumber){
         {
           name: "Mobility",
           fields: [
-            { label: "PNA Answer 1", value: formatValue(row[19]) },
-            { label: "PNA Answer 2", value: formatValue(row[20]) },
-            { label: "PNA Answer 3", value: formatValue(row[21]) },
-            { label: "PNA Answer 4", value: formatValue(row[22]) },
-            { label: "PNA Answer 5", value: formatValue(row[23]) },
-            { label: "PNA Answer 6", value: formatValue(row[24]) },
-            { label: "PNA Answer 7", value: formatValue(row[25]) },
-            { label: "PNA Answer 8", value: formatValue(row[26]) },
-            { label: "PNA Answer 9", value: formatValue(row[27]) },
-            { label: "PNA Answer 10", value: formatValue(row[28]) },
-            { label: "PNA Answer 11", value: formatValue(row[29]) },
-            { label: "PNA Answer 12", value: formatValue(row[30]) },
-            { label: "PNA Answer 13", value: formatValue(row[31]) },
-            { label: "PNA Answer 14", value: formatValue(row[32]) },
-            { label: "PNA Answer 15", value: formatValue(row[33]) },
-            { label: "PNA Answer 16", value: formatValue(row[34]) },
-            { label: "PNA Answer 17", value: formatValue(row[35]) },
-            { label: "PNA Answer 18", value: formatValue(row[36]) },
-            { label: "PNA Answer 19", value: formatValue(row[37]) },
-            { label: "PNA Answer 20", value: formatValue(row[38]) }
+            { label: "W", value: formatValue(row[65]) },
+            { label: "W 1", value: formatValue(row[66]) },
+            { label: "W 2", value: formatValue(row[67]) },
+            { label: "WC 1", value: formatValue(row[68]) },
+            { label: "WC 2", value: formatValue(row[69]) },
+            { label: "WT 1", value: formatValue(row[70]) },
+            { label: "WT 2", value: formatValue(row[71]) },
+            { label: "STR", value: formatValue(row[72]) },
+            { label: "A&E", value: formatValue(row[73]) }
           ]
         },
         {
           name: "Category",
           fields: [
-            { label: "PNA Answer 1", value: formatValue(row[19]) },
-            { label: "PNA Answer 2", value: formatValue(row[20]) },
-            { label: "PNA Answer 3", value: formatValue(row[21]) },
-            { label: "PNA Answer 4", value: formatValue(row[22]) },
-            { label: "PNA Answer 5", value: formatValue(row[23]) },
-            { label: "PNA Answer 6", value: formatValue(row[24]) },
-            { label: "PNA Answer 7", value: formatValue(row[25]) },
-            { label: "PNA Answer 8", value: formatValue(row[26]) },
-            { label: "PNA Answer 9", value: formatValue(row[27]) },
-            { label: "PNA Answer 10", value: formatValue(row[28]) },
-            { label: "PNA Answer 11", value: formatValue(row[29]) },
-            { label: "PNA Answer 12", value: formatValue(row[30]) },
-            { label: "PNA Answer 13", value: formatValue(row[31]) },
-            { label: "PNA Answer 14", value: formatValue(row[32]) },
-            { label: "PNA Answer 15", value: formatValue(row[33]) },
-            { label: "PNA Answer 16", value: formatValue(row[34]) },
-            { label: "PNA Answer 17", value: formatValue(row[35]) },
-            { label: "PNA Answer 18", value: formatValue(row[36]) },
-            { label: "PNA Answer 19", value: formatValue(row[37]) },
-            { label: "PNA Answer 20", value: formatValue(row[38]) }
+            { label: "Out Patient", value: formatValue(row[74]) },
+            { label: "Day Patient", value: formatValue(row[75]) },
+            { label: "Admission", value: formatValue(row[76]) },
+            { label: "Transfer", value: formatValue(row[77]) },
+            { label: "Discharge", value: formatValue(row[78]) },
+            { label: "House to House Transfer", value: formatValue(row[79]) },
+            { label: "Home Assessment", value: formatValue(row[80]) }
+          ]
+        },
+        {
+          name: "Method",
+          fields: [
+            { label: "Relative Escort", value: formatValue(row[81]) },
+            { label: "Medical Escort", value: formatValue(row[82]) },
+            { label: "Private/ECR", value: formatValue(row[83]) }
+          ]
+        },
+        {
+          name: "Pick Up",
+          fields: [
+            { label: "PickUp Post Code", value: formatValue(row[84]) },
+            { label: "PickUp House Name/Number", value: formatValue(row[85]) },
+            { label: "PickUp Street", value: formatValue(row[86]) },
+            { label: "PickUp Town/City", value: formatValue(row[87]) },
+            { label: "PickUp Hospital", value: formatValue(row[88]) },
+            { label: "PickUp Clinic/Department", value: formatValue(row[89]) }
           ]
         },
          {
-          name: "Pick Up/Deliver",
+          name: "Deliver To",
           fields: [
-            { label: "PNA Answer 1", value: formatValue(row[19]) },
-            { label: "PNA Answer 2", value: formatValue(row[20]) },
-            { label: "PNA Answer 3", value: formatValue(row[21]) },
-            { label: "PNA Answer 4", value: formatValue(row[22]) },
-            { label: "PNA Answer 5", value: formatValue(row[23]) },
-            { label: "PNA Answer 6", value: formatValue(row[24]) },
-            { label: "PNA Answer 7", value: formatValue(row[25]) },
-            { label: "PNA Answer 8", value: formatValue(row[26]) },
-            { label: "PNA Answer 9", value: formatValue(row[27]) },
-            { label: "PNA Answer 10", value: formatValue(row[28]) },
-            { label: "PNA Answer 11", value: formatValue(row[29]) },
-            { label: "PNA Answer 12", value: formatValue(row[30]) },
-            { label: "PNA Answer 13", value: formatValue(row[31]) },
-            { label: "PNA Answer 14", value: formatValue(row[32]) },
-            { label: "PNA Answer 15", value: formatValue(row[33]) },
-            { label: "PNA Answer 16", value: formatValue(row[34]) },
-            { label: "PNA Answer 17", value: formatValue(row[35]) },
-            { label: "PNA Answer 18", value: formatValue(row[36]) },
-            { label: "PNA Answer 19", value: formatValue(row[37]) },
-            { label: "PNA Answer 20", value: formatValue(row[38]) }
+            { label: "Deliver Post Code", value: formatValue(row[90]) },
+            { label: "Deliver House Name/Number", value: formatValue(row[91) },
+            { label: "Deliver Street", value: formatValue(row[92]) },
+            { label: "Deliver Town/City", value: formatValue(row[93]) },
+            { label: "Deliver Hospital", value: formatValue(row[94]) },
+            { label: "Deliver Clinic/Department", value: formatValue(row[95]) }
           ]
         },
         {
           name: "Notes/Requirements",
           fields: [
-            { label: "Appeal", value: formatValue(row[39]) },
-            { label: "Eligible", value: formatValue(row[40]) },
-            { label: "Ineligible", value: formatValue(row[41]) },
-            { label: "Reason", value: formatValue(row[42]) },
-            { label: "PNA Additional Notes", value: formatValue(row[43]) }
+            { label: "Disabilities", value: formatValue(row[96]) },
+            { label: "Equipment", value: formatValue(row[97]) },
+            { label: "Requirements", value: formatValue(row[98]) },
+            { label: "Patient Note", value: formatValue(row[99]) },
+            { label: "Journey Note", value: formatValue(row[100]) },
+            { label: "Private Note", value: formatValue(row[101]) }
           ]
         }
       ]
