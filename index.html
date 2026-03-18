@@ -435,19 +435,32 @@ function isEmpty(value){
   )
 }
 /* =========================
-   STEP 3: VALUE FORMATTER (UPDATED)
+   STEP 3: VALUE TER (UPDATED)
 ========================= */
 function formatValue(value){
+
   if(value === null || value === undefined) return ""
 
+  // ✅ Convert Excel time (number between 0 and 1)
+  if(typeof value === "number" && value > 0 && value < 1){
+    const totalMinutes = Math.round(value * 24 * 60)
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+
+    return `${hours.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")}`
+  }
+
+  // ✅ Checkbox handling
   if(["ý","1",1,true,"TRUE","Yes"].includes(value)) return true
   if(["o","0",0,false,"FALSE","No"].includes(value)) return false
 
-  if(value instanceof Date) return value.toLocaleDateString()
+  // ✅ Date handling
+  if(value instanceof Date){
+    return value.toLocaleDateString()
+  }
 
   return value.toString()
 }
-
 /* =========================
    STEP 2: MAP ROW → SECTIONS
 ========================= */
