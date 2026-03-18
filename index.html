@@ -427,6 +427,10 @@ function isCheckboxValue(value){
 }
 
 function isEmpty(value){
+
+  // Treat unchecked checkboxes as empty
+  if(value === false) return true;
+
   return (
     value === null ||
     value === undefined ||
