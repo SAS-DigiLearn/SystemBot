@@ -331,11 +331,23 @@ const COLUMN_MAP = {
 let SHEET_DATA = {}
 
 /* =========================
-   STEP 3: VALUE FORMATTER
+   ✅ NEW: CHECKBOX DETECTOR
+========================= */
+function isCheckboxValue(value){
+  return ["ý","o","1","0",1,0,true,false,"TRUE","FALSE","Yes","No"].includes(value)
+}
+
+/* =========================
+   STEP 3: VALUE FORMATTER (UPDATED)
 ========================= */
 function formatValue(value){
   if(value === null || value === undefined) return ""
+
+  if(["ý","1",1,true,"TRUE","Yes"].includes(value)) return true
+  if(["o","0",0,false,"FALSE","No"].includes(value)) return false
+
   if(value instanceof Date) return value.toLocaleDateString()
+
   return value.toString()
 }
 
@@ -556,9 +568,18 @@ function renderSheet(sections){
             row.className = "data-row"
           }
 
-          row.innerHTML = `
-            <span>${field.label}</span>
-            <span>${field.value}</span>
+        let displayValue
+
+if(isCheckboxValue(field.value) || typeof field.value === "boolean"){
+  displayValue = `<input type="checkbox" ${field.value ? "checked" : ""} disabled>`
+}else{
+  displayValue = field.value
+}
+
+row.innerHTML = `
+  <span>${field.label}</span>
+  <span>${displayValue}</span>
+`
           `
 
           groupContent.appendChild(row)
