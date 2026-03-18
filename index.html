@@ -463,7 +463,7 @@ function generatePlaceholderSheet(sheetNumber){
    EXISTING FUNCTIONS (UNCHANGED)
 ========================= */
 function toggleSection(title,content){
-  const isOpen = content.style.maxHeight
+  const isOpen = content.classList.contains("open")
 
   if(isOpen){
     content.style.maxHeight = null
@@ -471,10 +471,14 @@ function toggleSection(title,content){
     title.classList.remove("active")
     title.setAttribute("aria-expanded","false")
   }else{
-    content.style.maxHeight = content.scrollHeight + "px"
     content.classList.add("open")
     title.classList.add("active")
     title.setAttribute("aria-expanded","true")
+
+    
+    requestAnimationFrame(() => {
+      content.style.maxHeight = content.scrollHeight + "px"
+    })
   }
 }
 
