@@ -696,7 +696,7 @@ fetch(DATA_URL)
   .then(buffer => {
     const data = new Uint8Array(buffer);
     const workbook = XLSX.read(data, { type: "array" });
-  /* const sheetNames = workbook.SheetNames
+  const sheetNames = workbook.SheetNames
 
 // Pick random sheet
 const randomIndex = Math.floor(Math.random() * sheetNames.length)
@@ -705,11 +705,11 @@ const sheet = workbook.Sheets[selectedSheetName];
 
 
 console.log("User assigned to sheet:", selectedSheetName)
-*/
+
     
 //lock user
 
-const sheetNames = workbook.SheetNames
+/* const sheetNames = workbook.SheetNames
 
 let selectedSheetName = localStorage.getItem("assignedSheet")
 
@@ -723,7 +723,7 @@ if(!selectedSheetName){
 const sheet = workbook.Sheets[selectedSheetName]
 
 console.log("User assigned to sheet:", selectedSheetName)
-
+*/
 //end of user lock
     
     
