@@ -718,13 +718,11 @@ if(!selectedSheetName){
   const randomIndex = Math.floor(Math.random() * sheetNames.length)
   selectedSheetName = sheetNames[randomIndex]
   const sheet = workbook.Sheets[selectedSheetName];
-  localStorage.setItem("assignedSheet", selectedSheetName)
   console.log("User assigned to sheet:", selectedSheetName)
+  localStorage.setItem("assignedSheet", selectedSheetName)
+  
 }
 
-const sheet = workbook.Sheets[selectedSheetName]
-
-console.log("User assigned to sheet:", selectedSheetName)
 
 //end of user lock
     
