@@ -779,6 +779,8 @@ function toggleSection(title,content){
 function loadSheet(index){
   currentSheet = index
 
+localStorage.setItem("currentExercise", index)
+  
 document.getElementById("sheetTitle").innerHTML =
   `Exercise ${index+1} <span class="sheet-badge">${selectedSheetName}</span>`
 
