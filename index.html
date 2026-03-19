@@ -737,7 +737,13 @@ console.log("User assigned to sheet:", selectedSheetName)
       SHEET_DATA[sheetNumber] = mapRowToSections(row, sheetNumber);
     });
 
-    loadSheet(0);
+   const savedExercise = localStorage.getItem("currentExercise")
+
+if(savedExercise !== null){
+  loadSheet(parseInt(savedExercise))
+} else {
+  loadSheet(0)
+}
   })
   .catch(err => console.error("Failed to load Excel file:", err));
 
