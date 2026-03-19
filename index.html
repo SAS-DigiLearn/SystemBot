@@ -710,19 +710,22 @@ console.log("User assigned to sheet:", selectedSheetName)
    */ 
 //lock user
 
-const sheetNames = workbook.SheetNames
+constconst sheetNames = workbook.SheetNames
 
-let selectedSheetName = localStorage.getItem("assignedSheet")
+// ✅ Get stored sheet (DO NOT redeclare with let)
+selectedSheetName = localStorage.getItem("assignedSheet")
 
+// ✅ If none exists, assign one
 if(!selectedSheetName){
   const randomIndex = Math.floor(Math.random() * sheetNames.length)
   selectedSheetName = sheetNames[randomIndex]
-  const sheet = workbook.Sheets[selectedSheetName];
-  console.log("User assigned to sheet:", selectedSheetName)
   localStorage.setItem("assignedSheet", selectedSheetName)
-  
 }
 
+// ✅ ALWAYS define sheet AFTER
+const sheet = workbook.Sheets[selectedSheetName]
+
+console.log("User assigned to sheet:", selectedSheetName)
 
 //end of user lock
     
