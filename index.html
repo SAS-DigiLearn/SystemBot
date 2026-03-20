@@ -47,15 +47,16 @@ box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
 
 .sheet-header{
-display:flex;
-justify-content: flex-start;
-align-items:center;
-margin-bottom:20px;
-gap:15px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
 }
 
 /* NEW: selector styling */
 #sheetSelector{
+justify-self: start;
 padding: 10px;
 border-radius: 8px;
 border: 2px solid #ddd;
@@ -69,15 +70,13 @@ order: 0;
 }
 
 #sheetTitle{
-  order: 1; 
+  text-align: center;
   font-size: 20px;
   font-weight: bold;
-  color:#b91e71;
-}
+  }
 
 #progressText{
-  order: 2; 
-  margin-left: auto; 
+ justify-self: end;
 }
 
 .progress-bar{
@@ -846,7 +845,7 @@ function loadSheet(index){
   localStorage.setItem("currentExercise", index)
   
   document.getElementById("sheetTitle").innerHTML =
-    `Exercise ${index+1} <span class="sheet-badge">${selectedSheetName}</span>`
+  `Exercise ${index+1}`
 
   document.getElementById("progressText").textContent =
     (index+1) + " / " + TOTAL_SHEETS
