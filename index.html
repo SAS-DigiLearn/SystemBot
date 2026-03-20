@@ -726,11 +726,11 @@ function loadSelectedSheet(){
 
   const savedExercise = localStorage.getItem("currentExercise");
 
-  if(savedExercise !== null){
-    loadSheet(parseInt(savedExercise));
-  } else {
-    loadSheet(0);
-  }
+if(savedExercise !== null && !isNaN(savedExercise)){
+  loadSheet(parseInt(savedExercise));
+} else {
+  loadSheet(0);
+}
 }
 
 /* =========================
@@ -770,13 +770,20 @@ fetch(DATA_URL)
     }
 
     // Handle user change
-    selector.addEventListener("change", () => {
-      if(!selector.value) return;
-      selectedSheetName = selector.value;
-      localStorage.setItem("assignedSheet", selectedSheetName);
-      localStorage.removeItem("currentExercise"); // reset progress
-      loadSelectedSheet();
-    });
+   selector.addEventListener("change", () => {
+
+  if(!selector.value) return;
+
+  // ✅ Only reset if different sheet selected
+  if(selector.value !== selectedSheetName){
+    localStorage.removeItem("currentExercise");
+  }
+
+  selectedSheetName = selector.value;
+  localStorage.setItem("assignedSheet", selectedSheetName);
+
+  loadSelectedSheet();
+});
 
   })
   .catch(err => console.error("Failed to load Excel file:", err));
