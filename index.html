@@ -48,10 +48,10 @@ box-shadow:0 2px 10px rgba(0,0,0,0.08);
 
 .sheet-header{
 display:flex;
-justify-content:space-between;
+justify-content: flex-start;
 align-items:center;
 margin-bottom:20px;
-gap:10px;
+gap:15px;
 }
 
 /* NEW: selector styling */
@@ -60,11 +60,24 @@ padding: 10px;
 border-radius: 8px;
 border: 2px solid #ddd;
 font-size: 14px;
+order: 0;
 }
 
 #sheetSelector:focus {
   border-color: #b91e71;
   outline: none;
+}
+
+#sheetTitle{
+  order: 1; 
+  font-size: 20px;
+  font-weight: bold;
+  color:#b91e71;
+}
+
+#progressText{
+  order: 2; 
+  margin-left: auto; 
 }
 
 .progress-bar{
