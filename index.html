@@ -789,9 +789,8 @@ fetch(DATA_URL)
     }
 
     // Handle user change
- selector.addEventListener("change", () => {
+selector.addEventListener("change", () => {
 
-  // ✅ If user selects "Select sheet..."
   if(!selector.value){
     selectedSheetName = "";
     localStorage.removeItem("assignedSheet");
@@ -803,32 +802,18 @@ fetch(DATA_URL)
     document.getElementById("sheetTitle").textContent = "";
     document.getElementById("progressText").textContent = "";
 
-    // ✅ DISABLE NAV BUTTONS HERE
     document.getElementById("prevBtn").disabled = true;
     document.getElementById("nextBtn").disabled = true;
 
     return;
   }
 
-  // ✅ Normal flow
   selectedSheetName = selector.value;
   localStorage.setItem("assignedSheet", selectedSheetName);
   localStorage.removeItem("currentExercise");
 
-  // Re-enable buttons when a sheet is selected
   document.getElementById("prevBtn").disabled = false;
   document.getElementById("nextBtn").disabled = false;
-
-  loadSelectedSheet();
-});
-
-  // ✅ Only reset if different sheet selected
-  if(selector.value !== selectedSheetName){
-    localStorage.removeItem("currentExercise");
-  }
-
-  selectedSheetName = selector.value;
-  localStorage.setItem("assignedSheet", selectedSheetName);
 
   loadSelectedSheet();
 });
