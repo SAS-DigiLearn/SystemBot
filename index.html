@@ -791,7 +791,20 @@ fetch(DATA_URL)
     // Handle user change
    selector.addEventListener("change", () => {
 
-  if(!selector.value) return;
+  if(!selector.value){
+    selectedSheetName = "";
+    localStorage.removeItem("assignedSheet");
+    localStorage.removeItem("currentExercise");
+
+    document.getElementById("sheetTitle").innerHTML = "";
+    document.getElementById("progressText").textContent = "";
+    document.getElementById("progressFill").style.width = "0%";
+
+    document.getElementById("sheetContent").innerHTML =
+      "<p>Please select the sheet assigned by the trainer to begin.</p>";
+
+    return;
+  }
 
   // ✅ Only reset if different sheet selected
   if(selector.value !== selectedSheetName){
