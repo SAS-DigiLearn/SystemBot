@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
-
+/* --- YOUR ORIGINAL STYLES (UNCHANGED) --- */
 body{
 font-family:Arial,sans-serif;
 margin:0;
@@ -51,6 +51,13 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 margin-bottom:20px;
+gap:10px;
+}
+
+/* NEW: selector styling */
+#sheetSelector{
+padding:6px;
+border-radius:6px;
 }
 
 .progress-bar{
@@ -265,7 +272,8 @@ max-height:100%;
   border-radius:20px;
   margin-left:10px;
 }
-  
+
+
 </style>
 </head>
 
@@ -282,6 +290,12 @@ max-height:100%;
 
 <div class="sheet-header">
 <h2 id="sheetTitle"></h2>
+
+<!-- ✅ NEW DROPDOWN -->
+<select id="sheetSelector">
+  <option value="">Select sheet...</option>
+</select>
+
 <span id="progressText"></span>
 </div>
 
@@ -304,6 +318,7 @@ max-height:100%;
 const TOTAL_SHEETS = 20
 let currentSheet = 0
 let selectedSheetName = "";
+let workbookRef = null;
 
 /* =========================
    STEP 1: COLUMN MAP
@@ -687,7 +702,39 @@ function mapRowToSections(row, sheetNumber){
   ]
 }
 /* =========================
-   STEP 4: FETCH EXCEL FROM GIT
+   NEW: LOAD SELECTED SHEET
+========================= */
+function loadSelectedSheet(){
+
+  if(!selectedSheetName){
+    document.getElementById("sheetContent").innerHTML =
+      "<p>Please select a sheet to begin.</p>";
+    return;
+  }
+
+  const sheet = workbookRef.Sheets[selectedSheetName];
+
+  const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+  SHEET_DATA = {};
+
+  json.forEach(row => {
+    const sheetNumber = row[0];
+    if(!sheetNumber) return;
+    SHEET_DATA[sheetNumber] = mapRowToSections(row, sheetNumber);
+  });
+
+  const savedExercise = localStorage.getItem("currentExercise");
+
+  if(savedExercise !== null){
+    loadSheet(parseInt(savedExercise));
+  } else {
+    loadSheet(0);
+  }
+}
+
+/* =========================
+   FETCH EXCEL
 ========================= */
 const DATA_URL = "https://raw.githubusercontent.com/SAS-DigiLearn/SystemBot/main/data/PT_ Registration_Exercise_Data_version_7.xlsx";
 
@@ -696,63 +743,49 @@ fetch(DATA_URL)
   .then(buffer => {
     const data = new Uint8Array(buffer);
     const workbook = XLSX.read(data, { type: "array" });
-  //remove lock
-    /*const sheetNames = workbook.SheetNames
 
-// Pick random sheet
-const randomIndex = Math.floor(Math.random() * sheetNames.length)
-selectedSheetName = sheetNames[randomIndex]; // <- assign to the global variable
-const sheet = workbook.Sheets[selectedSheetName];
+    workbookRef = workbook;
 
+    const sheetNames = workbook.SheetNames;
 
-console.log("User assigned to sheet:", selectedSheetName)
+    const selector = document.getElementById("sheetSelector");
 
-   */ 
-//lock user
-
-const sheetNames = workbook.SheetNames
-
-// Get stored sheet
-selectedSheetName = localStorage.getItem("assignedSheet")
-
-// If none exists, assign one
-if(!selectedSheetName){
-  const randomIndex = Math.floor(Math.random() * sheetNames.length)
-  selectedSheetName = sheetNames[randomIndex]
-  localStorage.setItem("assignedSheet", selectedSheetName)
-}
-
-// Always define sheet AFTER
-const sheet = workbook.Sheets[selectedSheetName]
-
-console.log("User assigned to sheet:", selectedSheetName)
-
-//end of user lock
-    
-    
-    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-    SHEET_DATA = {};
-
-    json.forEach(row => {
-      const sheetNumber = row[0];
-      if(!sheetNumber) return;
-      SHEET_DATA[sheetNumber] = mapRowToSections(row, sheetNumber);
+    // Populate dropdown
+    sheetNames.forEach(name => {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      selector.appendChild(option);
     });
 
-   const savedExercise = localStorage.getItem("currentExercise")
+    // Load saved selection
+    selectedSheetName = localStorage.getItem("assignedSheet");
 
-if(savedExercise !== null){
-  loadSheet(parseInt(savedExercise))
-} else {
-  loadSheet(0)
-}
+    if(selectedSheetName && sheetNames.includes(selectedSheetName)){
+      selector.value = selectedSheetName;
+      loadSelectedSheet();
+    } else {
+      document.getElementById("sheetContent").innerHTML =
+        "<p>Please select the sheet assigned by the trainer to begin.</p>";
+    }
+
+    // Handle user change
+    selector.addEventListener("change", () => {
+      if(!selector.value) return;
+      selectedSheetName = selector.value;
+      localStorage.setItem("assignedSheet", selectedSheetName);
+      localStorage.removeItem("currentExercise"); // reset progress
+      loadSelectedSheet();
+    });
+
   })
   .catch(err => console.error("Failed to load Excel file:", err));
 
 /* =========================
-   STEP 5: USE DATA
+   REST OF YOUR ORIGINAL JS
+   (UNCHANGED BELOW)
 ========================= */
+
 function generatePlaceholderSheet(sheetNumber){
   return SHEET_DATA[sheetNumber] || [
     {
@@ -762,9 +795,6 @@ function generatePlaceholderSheet(sheetNumber){
   ]
 }
 
-/* =========================
-   EXISTING FUNCTIONS (UNCHANGED)
-========================= */
 function toggleSection(title,content){
   const isOpen = content.classList.contains("open")
 
@@ -778,7 +808,6 @@ function toggleSection(title,content){
     title.classList.add("active")
     title.setAttribute("aria-expanded","true")
 
-    
     requestAnimationFrame(() => {
       content.style.maxHeight = content.scrollHeight + "px"
     })
@@ -787,11 +816,10 @@ function toggleSection(title,content){
 
 function loadSheet(index){
   currentSheet = index
-
-localStorage.setItem("currentExercise", index)
+  localStorage.setItem("currentExercise", index)
   
-document.getElementById("sheetTitle").innerHTML =
-  `Exercise ${index+1} <span class="sheet-badge">${selectedSheetName}</span>`
+  document.getElementById("sheetTitle").innerHTML =
+    `Exercise ${index+1} <span class="sheet-badge">${selectedSheetName}</span>`
 
   document.getElementById("progressText").textContent =
     (index+1) + " / " + TOTAL_SHEETS
@@ -915,6 +943,7 @@ function renderSheet(sections){
   })
 }
 
+
 function updateProgressBar(){
   const percent = ((currentSheet+1)/TOTAL_SHEETS)*100
   document.getElementById("progressFill").style.width = percent + "%"
@@ -938,7 +967,6 @@ document.getElementById("prevBtn").addEventListener("click",()=>{
     loadSheet(currentSheet)
   }
 })
-
 </script>
 
 </body>
