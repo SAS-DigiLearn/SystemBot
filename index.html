@@ -859,7 +859,7 @@ function loadSheet(index){
   localStorage.setItem("currentExercise", index)
   
   document.getElementById("sheetTitle").innerHTML =
-  `Exercise ${index+1}`
+    `${selectedSheetName} – Exercise ${index+1}`
 
   document.getElementById("progressText").textContent =
     (index+1) + " / " + TOTAL_SHEETS
