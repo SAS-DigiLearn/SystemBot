@@ -503,8 +503,7 @@ function formatValue(value){
   if(["o","0",0,false,"FALSE","No"].includes(value)) return false
 
   // ✅ Date handling
-// ✅ Excel serial date → dd/mm/yyyy
-if(typeof value === "number" && value > 20000 && value < 60000){
+if(typeof value === "number" && value > 2000 && value < 60000){
 
   const excelEpoch = new Date(Date.UTC(1899,11,30));
   const date = new Date(excelEpoch.getTime() + value * 86400000);
