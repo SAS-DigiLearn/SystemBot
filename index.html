@@ -503,9 +503,9 @@ function formatValue(value){
   if(["o","0",0,false,"FALSE","No"].includes(value)) return false
 
   // ✅ Date handling
-  if(value instanceof Date){
-    return value.toLocaleDateString()
-  }
+if(value instanceof Date){
+  return value.toLocaleDateString("en-GB")
+}
 
   return value.toString()
 }
@@ -734,7 +734,11 @@ function loadSelectedSheet(){
 
   const sheet = workbookRef.Sheets[selectedSheetName];
 
-  const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+  const json = XLSX.utils.sheet_to_json(sheet, {
+  header: 1,
+  raw: false,
+  cellDates: true
+});
 
   SHEET_DATA = {};
 
