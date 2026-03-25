@@ -208,6 +208,19 @@ background:#ccc;
 cursor:not-allowed;
 }
 
+.section-title{
+  background:white;
+  color:#b91e71;
+}
+
+/* strong visible keyboard focus */
+.section-title:focus-visible{
+  outline:3px solid #b91e71;
+  outline-offset:3px;
+  box-shadow:0 0 0 4px rgba(185,30,113,0.2);
+  background:#fff0f6;
+}
+  
 .sheet-section{
 background:#fafafa;
 border-radius:10px;
@@ -923,32 +936,26 @@ function renderSheet(sections){
 
     const contentId = "section-content-" + index
 
-    const title = document.createElement("button")
-    title.className = "section-title"
-    title.textContent = section.name
-   title.setAttribute("role","button")
-title.setAttribute("tabindex","0")
+ const title = document.createElement("button")
+title.className = "section-title"
+title.textContent = section.name
+
 title.setAttribute("aria-expanded","false")
 title.setAttribute("aria-controls",contentId)
 title.id = "section-header-" + index
 
-    const content = document.createElement("div")
-    content.className = "section-content"
-    content.id = contentId
+const content = document.createElement("div")
+content.className = "section-content"
+content.id = contentId
 
-  content.setAttribute("role","region")
+content.setAttribute("role","region")
 content.setAttribute("aria-labelledby",title.id)
 content.setAttribute("aria-hidden","true")
-
-    title.addEventListener("click", () => {
-      toggleSection(title,content)
-    })
 
 title.addEventListener("click", () => {
   toggleSection(title,content)
 })
 
-/* ADD HERE */
 title.addEventListener("keydown", e=>{
 
   const titles = [...document.querySelectorAll(".section-title")]
@@ -974,12 +981,8 @@ title.addEventListener("keydown", e=>{
     titles[titles.length-1]?.focus()
   }
 
-  if(e.key === "Enter" || e.key === " "){
-    e.preventDefault()
-    toggleSection(title,content)
-  }
-
-})    
+})
+ 
     
     
     // ✅ ONLY ONE RENDER BLOCK
@@ -1014,6 +1017,7 @@ title.addEventListener("keydown", e=>{
 
   /* ADD ACCESSIBILITY STRUCTURE */
   row.setAttribute("role","group")
+  row.setAttribute("tabindex","0")
 
   const labelSpan = document.createElement("span")
   labelSpan.className = "data-label"
