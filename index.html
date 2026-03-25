@@ -293,6 +293,28 @@ max-height:100%;
   margin-left:10px;
 }
 
+/* Making accessibility adjustments */
+.section-title:focus-visible{
+  outline:3px solid #b91e71;
+  outline-offset:3px;
+  box-shadow:0 0 0 4px rgba(185,30,113,0.2);
+}
+
+/* persistent selected style */
+.section-title.active{
+  background:#fff0f6;
+  border-left:4px solid #b91e71;
+  font-weight:bold;
+}
+
+/* optional icon rotation indicator */
+.section-title::after{
+  content:"+";
+}
+
+.section-title.active::after{
+  content:"−";
+}
 
 </style>
 </head>
@@ -849,19 +871,28 @@ function generatePlaceholderSheet(sheetNumber){
 }
 
 function toggleSection(title,content){
+
   const isOpen = content.classList.contains("open")
 
   if(isOpen){
+
     content.style.maxHeight = null
     content.classList.remove("open")
+
     title.classList.remove("active")
     title.setAttribute("aria-expanded","false")
+
+    content.setAttribute("aria-hidden","true")
+
   }else{
+
     content.classList.add("open")
     title.classList.add("active")
-    title.setAttribute("aria-expanded","true")
 
-    requestAnimationFrame(() => {
+    title.setAttribute("aria-expanded","true")
+    content.setAttribute("aria-hidden","false")
+
+    requestAnimationFrame(()=>{
       content.style.maxHeight = content.scrollHeight + "px"
     })
   }
@@ -895,17 +926,62 @@ function renderSheet(sections){
     const title = document.createElement("button")
     title.className = "section-title"
     title.textContent = section.name
-    title.setAttribute("aria-expanded","false")
-    title.setAttribute("aria-controls",contentId)
+   title.setAttribute("role","button")
+title.setAttribute("tabindex","0")
+title.setAttribute("aria-expanded","false")
+title.setAttribute("aria-controls",contentId)
+title.id = "section-header-" + index
 
     const content = document.createElement("div")
     content.className = "section-content"
     content.id = contentId
 
+  content.setAttribute("role","region")
+content.setAttribute("aria-labelledby",title.id)
+content.setAttribute("aria-hidden","true")
+
     title.addEventListener("click", () => {
       toggleSection(title,content)
     })
 
+title.addEventListener("click", () => {
+  toggleSection(title,content)
+})
+
+/* ADD HERE */
+title.addEventListener("keydown", e=>{
+
+  const titles = [...document.querySelectorAll(".section-title")]
+  const currentIndex = titles.indexOf(title)
+
+  if(e.key === "ArrowDown"){
+    e.preventDefault()
+    titles[currentIndex+1]?.focus()
+  }
+
+  if(e.key === "ArrowUp"){
+    e.preventDefault()
+    titles[currentIndex-1]?.focus()
+  }
+
+  if(e.key === "Home"){
+    e.preventDefault()
+    titles[0]?.focus()
+  }
+
+  if(e.key === "End"){
+    e.preventDefault()
+    titles[titles.length-1]?.focus()
+  }
+
+  if(e.key === "Enter" || e.key === " "){
+    e.preventDefault()
+    toggleSection(title,content)
+  }
+
+})    
+    
+    
     // ✅ ONLY ONE RENDER BLOCK
     if(section.groups){
       section.groups.forEach(group => {
@@ -924,9 +1000,9 @@ function renderSheet(sections){
           groupContent.classList.add("grid")
         }
 
-       group.fields.forEach(field => {
+     group.fields.forEach(field => {
 
-  if(isEmpty(field.value)) return; // ✅ SKIP EMPTY
+  if(isEmpty(field.value)) return; // skip empty values
 
   const row = document.createElement("div")
 
@@ -936,20 +1012,39 @@ function renderSheet(sections){
     row.className = "data-row"
   }
 
-  let displayValue
+  /* ADD ACCESSIBILITY STRUCTURE */
+  row.setAttribute("role","group")
+
+  const labelSpan = document.createElement("span")
+  labelSpan.className = "data-label"
+  labelSpan.id = `label-${index}-${field.label.replace(/\s/g,'')}`
+  labelSpan.textContent = field.label
+
+  const valueSpan = document.createElement("span")
+  valueSpan.className = "data-value"
 
   if(isCheckboxValue(field.value) || typeof field.value === "boolean"){
-    displayValue = `<input type="checkbox" ${field.value ? "checked" : ""} disabled>`
+
+    const checkbox = document.createElement("input")
+    checkbox.type = "checkbox"
+    checkbox.checked = field.value
+    checkbox.disabled = true
+
+    checkbox.setAttribute("aria-labelledby",labelSpan.id)
+
+    valueSpan.appendChild(checkbox)
+
   }else{
-    displayValue = field.value
+
+    valueSpan.textContent = field.value
+
   }
 
-  row.innerHTML = `
-    <span>${field.label}</span>
-    <span>${displayValue}</span>
-  `
+  row.appendChild(labelSpan)
+  row.appendChild(valueSpan)
 
   groupContent.appendChild(row)
+
 })
 
        if(groupContent.children.length > 0){
