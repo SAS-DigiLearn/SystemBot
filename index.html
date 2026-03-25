@@ -315,7 +315,6 @@ max-height:100%;
 
 /* persistent selected style */
 .section-title.active{
-  background:#fff0f6;
   border-left:4px solid #b91e71;
   font-weight:bold;
 }
@@ -887,6 +886,8 @@ function toggleSection(title,content){
 
   const isOpen = content.classList.contains("open")
 
+  const focusableRows = content.querySelectorAll(".data-row")
+
   if(isOpen){
 
     content.style.maxHeight = null
@@ -894,8 +895,12 @@ function toggleSection(title,content){
 
     title.classList.remove("active")
     title.setAttribute("aria-expanded","false")
-
     content.setAttribute("aria-hidden","true")
+
+    // remove rows from tab order
+    focusableRows.forEach(row=>{
+      row.setAttribute("tabindex","-1")
+    })
 
   }else{
 
@@ -904,6 +909,11 @@ function toggleSection(title,content){
 
     title.setAttribute("aria-expanded","true")
     content.setAttribute("aria-hidden","false")
+
+    // allow tabbing inside open section
+    focusableRows.forEach(row=>{
+      row.setAttribute("tabindex","0")
+    })
 
     requestAnimationFrame(()=>{
       content.style.maxHeight = content.scrollHeight + "px"
@@ -1017,7 +1027,7 @@ title.addEventListener("keydown", e=>{
 
   /* ADD ACCESSIBILITY STRUCTURE */
   row.setAttribute("role","group")
-  row.setAttribute("tabindex","0")
+row.setAttribute("tabindex","-1")
 
   const labelSpan = document.createElement("span")
   labelSpan.className = "data-label"
