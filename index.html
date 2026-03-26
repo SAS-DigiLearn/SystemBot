@@ -1,1135 +1,1380 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>PTS Exercises</title>
+  <meta charset="UTF-8">
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <!-- =========================================================
+       PAGE TITLE (what shows in the browser tab)
+       ========================================================= -->
+  <title>PTS Exercises</title>
 
-<style>
+  <!-- =========================================================
+       EXTERNAL LIBRARY: SheetJS (xlsx)
+       - This lets the page download and read Excel files in the browser
+       - Without it, the browser cannot understand .xlsx data
+       ========================================================= -->
+  https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js</script>
 
-body{
-font-family:Arial,sans-serif;
-margin:0;
-background:#f5f6fa;
-}
+  <style>
+    /* =========================================================
+       SECTION: GLOBAL PAGE STYLES
+       - Sets the default font, removes browser margins,
+         and sets the page background colour
+       ========================================================= */
+    body{
+      font-family:Arial,sans-serif;
+      margin:0;
+      background:#f5f6fa;
+    }
 
-header{
-background:#ffffff;
-padding:20px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-box-shadow:0 2px 8px rgba(0,0,0,0.05);
-}
+    /* =========================================================
+       SECTION: HEADER AREA (top bar)
+       - White header with a title on the left and logo on the right
+       ========================================================= */
+    header{
+      background:#ffffff;
+      padding:20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      box-shadow:0 2px 8px rgba(0,0,0,0.05);
+    }
 
-.title{
-font-size:22px;
-font-weight:bold;
-color:#b91e71;
-}
+    .title{
+      font-size:22px;
+      font-weight:bold;
+      color:#b91e71;
+    }
 
-.header-logo{
-height:60px;
-}
-  
-.container{
-padding:25px;
-max-width:1000px;
-margin:auto;
-}
+    .header-logo{
+      height:60px;
+    }
 
-.sheet-card{
-background:white;
-padding:30px;
-border-radius:14px;
-box-shadow:0 2px 10px rgba(0,0,0,0.08);
-}
+    /* =========================================================
+       SECTION: MAIN PAGE CONTAINER
+       - Keeps content centred and adds spacing
+       ========================================================= */
+    .container{
+      padding:25px;
+      max-width:1000px;
+      margin:auto;
+    }
 
-.sheet-header{
- position: relative;
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
+    /* =========================================================
+       SECTION: MAIN "CARD" THAT HOLDS THE EXERCISE UI
+       ========================================================= */
+    .sheet-card{
+      background:white;
+      padding:30px;
+      border-radius:14px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    }
 
-/* NEW: selector styling */
-#sheetSelector{
-padding: 10px;
-border-radius: 8px;
-border: 2px solid #ddd;
-font-size: 14px;
-margin-right: auto;
-}
+    /* =========================================================
+       SECTION: HEADER INSIDE THE CARD (title, dropdown, progress text)
+       ========================================================= */
+    .sheet-header{
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
 
-#sheetSelector:focus {
-  border-color: #b91e71;
-  outline: none;
-}
+    /* =========================================================
+       SECTION: DROPDOWN (sheet selector)
+       - The user chooses which Excel worksheet to use
+       ========================================================= */
+    #sheetSelector{
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #ddd;
+      font-size: 14px;
+      margin-right: auto;
+    }
 
-#sheetTitle{
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 20px;
-  font-weight: bold;
-  color: #b91e71;
-  }
+    #sheetSelector:focus {
+      border-color: #b91e71;
+      outline: none;
+    }
 
-#progressText{
-margin-left: auto;
-}
+    /* =========================================================
+       SECTION: MAIN TITLE (sheet + exercise number)
+       - Positioned dead centre of the sheet-header bar
+       ========================================================= */
+    #sheetTitle{
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 20px;
+      font-weight: bold;
+      color: #b91e71;
+    }
 
-.progress-bar{
-height:8px;
-background:#eee;
-border-radius:20px;
-margin-bottom:25px;
-overflow:hidden;
-}
+    /* =========================================================
+       SECTION: PROGRESS TEXT (e.g., "3 / 20")
+       - Floats to the right side of the sheet-header bar
+       ========================================================= */
+    #progressText{
+      margin-left: auto;
+    }
 
-.progress-fill{
-height:100%;
-background:#b91e71;
-width:0%;
-transition:width 0.3s;
-}
+    /* =========================================================
+       SECTION: PROGRESS BAR (visual progress)
+       ========================================================= */
+    .progress-bar{
+      height:8px;
+      background:#eee;
+      border-radius:20px;
+      margin-bottom:25px;
+      overflow:hidden;
+    }
 
-.sheet-section{
-margin-bottom:25px;
-}
+    .progress-fill{
+      height:100%;
+      background:#b91e71;
+      width:0%;
+      transition:width 0.3s;
+    }
 
-.section-title{
-font-size:16px;
-font-weight:bold;
-color:#b91e71;
-padding:14px 18px;
-cursor:pointer;
-display:flex;
-justify-content:space-between;
-align-items:center;
-background:white;
-margin-bottom:0;
-width:100%;
-border:none;
-text-align:left;
-}
+    /* =========================================================
+       SECTION: "ACCORDION" SECTIONS (expand/collapse blocks)
+       ========================================================= */
+    .sheet-section{
+      margin-bottom:25px;
+    }
 
-.section-title::after{
-content:"+";
-font-size:18px;
-transition:transform 0.25s;
-}
+    /* The clickable button that opens/closes a section */
+    .section-title{
+      font-size:16px;
+      font-weight:bold;
+      color:#b91e71;
+      padding:14px 18px;
+      cursor:pointer;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:white;
+      margin-bottom:0;
+      width:100%;
+      border:none;
+      text-align:left;
+    }
 
-.section-title.active::after{
-content:"−";
-}
+    /* The plus/minus icon that appears after the title text */
+    .section-title::after{
+      content:"+";
+      font-size:18px;
+      transition:transform 0.25s;
+    }
 
-.section-title:focus{
-outline:3px solid #b91e71;
-outline-offset:2px;
-}
+    /* When active/open, show minus instead of plus */
+    .section-title.active::after{
+      content:"−";
+    }
 
-.data-row{
-display:flex;
-justify-content:space-between;
-padding:8px 0;
-border-bottom:1px solid #eee;
-}
+    /* Keyboard focus style */
+    .section-title:focus{
+      outline:3px solid #b91e71;
+      outline-offset:2px;
+    }
 
-/* EXISTING layout styles */
-.data-row.two-column{
-justify-content: space-between;
-font-weight: 500;
-}
+    /* =========================================================
+       SECTION: ROW STYLES (label/value lines)
+       ========================================================= */
+    .data-row{
+      display:flex;
+      justify-content:space-between;
+      padding:8px 0;
+      border-bottom:1px solid #eee;
+    }
 
-.data-row.highlight{
-background:#fff0f6;
-padding:10px;
-border-radius:6px;
-margin-bottom:6px;
-border:none;
-}
+    /* Existing layout styles */
+    .data-row.two-column{
+      justify-content: space-between;
+      font-weight: 500;
+    }
 
-.data-row.minimal{
-border:none;
-padding:4px 0;
-color:#666;
-}
+    .data-row.highlight{
+      background:#fff0f6;
+      padding:10px;
+      border-radius:6px;
+      margin-bottom:6px;
+      border:none;
+    }
 
-/* NEW: GRID LAYOUT */
-.section-content.grid{
-display:grid;
-grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-gap:10px 20px;
-}
+    .data-row.minimal{
+      border:none;
+      padding:4px 0;
+      color:#666;
+    }
 
-.data-row.grid{
-display:flex;
-flex-direction:column;
-border:none;
-padding:8px 10px;
-background:white;
-border-radius:6px;
-}
+    /* =========================================================
+       SECTION: GRID LAYOUT (cards/columns)
+       - Used when a section is set to layout: "grid"
+       ========================================================= */
+    .section-content.grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap:10px 20px;
+    }
 
-.data-row.grid span:first-child{
-font-size:12px;
-color:#888;
-}
+    /* In grid mode each row becomes a “mini card” */
+    .data-row.grid{
+      display:flex;
+      flex-direction:column;
+      border:none;
+      padding:8px 10px;
+      background:white;
+      border-radius:6px;
+    }
 
-.data-row.grid span:last-child{
-font-weight:bold;
-color:#333;
-}
+    .data-row.grid span:first-child{
+      font-size:12px;
+      color:#888;
+    }
 
-.sheet-nav{
-display:flex;
-justify-content:space-between;
-margin-top:30px;
-}
+    .data-row.grid span:last-child{
+      font-weight:bold;
+      color:#333;
+    }
 
-button{
-background:#b91e71;
-color:white;
-border:none;
-padding:10px 18px;
-border-radius:8px;
-cursor:pointer;
-font-size:14px;
-}
+    /* =========================================================
+       SECTION: NEXT / PREVIOUS NAVIGATION BUTTONS
+       ========================================================= */
+    .sheet-nav{
+      display:flex;
+      justify-content:space-between;
+      margin-top:30px;
+    }
 
-button:hover{
-opacity:0.9;
-}
+    button{
+      background:#b91e71;
+      color:white;
+      border:none;
+      padding:10px 18px;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:14px;
+    }
 
-button:disabled{
-background:#ccc;
-cursor:not-allowed;
-}
+    button:hover{
+      opacity:0.9;
+    }
 
-.section-title{
-  background:white;
-  color:#b91e71;
-}
+    button:disabled{
+      background:#ccc;
+      cursor:not-allowed;
+    }
 
-/* strong visible keyboard focus */
-.section-title:focus-visible{
-  outline:3px solid #b91e71;
-  outline-offset:3px;
-  box-shadow:0 0 0 4px rgba(185,30,113,0.2);
-  background:#fff0f6;
-}
-  
-.sheet-section{
-background:#fafafa;
-border-radius:10px;
-margin-bottom:15px;
-border:1px solid #eee;
-overflow:hidden;
-transition:box-shadow 0.2s ease;
-}
+    /* =========================================================
+       SECTION: ACCORDION LOOK & FEEL + ACCESSIBILITY
+       ========================================================= */
+    .section-title{
+      background:white;
+      color:#b91e71;
+    }
 
-.sheet-section:hover{
-box-shadow:0 4px 12px rgba(0,0,0,0.05);
-}
+    /* Strong visible keyboard focus */
+    .section-title:focus-visible{
+      outline:3px solid #b91e71;
+      outline-offset:3px;
+      box-shadow:0 0 0 4px rgba(185,30,113,0.2);
+      background:#fff0f6;
+    }
 
-.section-content{
-max-height:0;
-overflow:hidden;
-transition:max-height 0.35s ease;
-padding:0 18px;
-background:#fafafa;
-}
+    /* Section wrapper style */
+    .sheet-section{
+      background:#fafafa;
+      border-radius:10px;
+      margin-bottom:15px;
+      border:1px solid #eee;
+      overflow:hidden;
+      transition:box-shadow 0.2s ease;
+    }
 
-.section-content.open{
-padding-bottom:10px;
-max-height:100%;
-}
+    .sheet-section:hover{
+      box-shadow:0 4px 12px rgba(0,0,0,0.05);
+    }
 
-.group-block{
-  margin-bottom: 5px;
-  margin-top: 10px;
-  background:white;
-  padding:12px;
-  border-radius:8px;
-  border:1px solid #eee;
-}
+    /* The hidden/expandable content area */
+    .section-content{
+      max-height:0;               /* collapsed by default */
+      overflow:hidden;
+      transition:max-height 0.35s ease;
+      padding:0 18px;
+      background:#fafafa;
+    }
 
-.group-title{
-  font-size:13px;
-  font-weight:bold;
-  color:#555;
-  margin-bottom:8px;
-  padding-left:4px;
-}
+    /* When opened, allow it to expand */
+    .section-content.open{
+      padding-bottom:10px;
+      max-height:100%;
+    }
 
-.group-content{
-  display:block;
-}
+    /* =========================================================
+       SECTION: GROUP BLOCKS INSIDE A SECTION
+       - Example: "Address and Contact" inside "Personal Info"
+       ========================================================= */
+    .group-block{
+      margin-bottom: 5px;
+      margin-top: 10px;
+      background:white;
+      padding:12px;
+      border-radius:8px;
+      border:1px solid #eee;
+    }
 
-.group-content.grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap:10px 20px;
-}
+    .group-title{
+      font-size:13px;
+      font-weight:bold;
+      color:#555;
+      margin-bottom:8px;
+      padding-left:4px;
+    }
 
+    .group-content{
+      display:block;
+    }
 
+    .group-content.grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap:10px 20px;
+    }
 
-.data-row input[type="checkbox"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  position: relative;
-  pointer-events: none;
-  margin-right: 8px;
-}
+    /* =========================================================
+       SECTION: CHECKBOX DISPLAY STYLES
+       - These are not real clickable checkboxes (pointer-events none)
+       - They are visual indicators for Yes/No style values
+       ========================================================= */
+    .data-row input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      position: relative;
+      pointer-events: none;
+      margin-right: 8px;
+    }
 
-.data-row input[type="checkbox"]:checked::after {
-  content: "✔";
-  position: absolute;
-  top: -2px;
-  left: 1px;
-  font-size: 14px;
-  color: #b91e71; /* pink checkmark */
-}
+    .data-row input[type="checkbox"]:checked::after {
+      content: "✔";
+      position: absolute;
+      top: -2px;
+      left: 1px;
+      font-size: 14px;
+      color: #b91e71; /* pink checkmark */
+    }
 
-.sheet-badge{
-  background:#ffe5f2;
-  color:#8C1756;
-  font-size:12px;
-  padding:4px 10px;
-  border-radius:20px;
-  margin-left:10px;
-}
+    /* A badge style (not currently used in markup here, but available) */
+    .sheet-badge{
+      background:#ffe5f2;
+      color:#8C1756;
+      font-size:12px;
+      padding:4px 10px;
+      border-radius:20px;
+      margin-left:10px;
+    }
 
-/* Making accessibility adjustments */
-.section-title:focus-visible{
-  outline:3px solid #b91e71;
-  outline-offset:3px;
-  box-shadow:0 0 0 4px rgba(185,30,113,0.2);
-}
+    /* Repeated focus-visible style (kept exactly as-is) */
+    .section-title:focus-visible{
+      outline:3px solid #b91e71;
+      outline-offset:3px;
+      box-shadow:0 0 0 4px rgba(185,30,113,0.2);
+    }
 
-/* persistent selected style */
-.section-title.active{
-  border-left:4px solid #b91e71;
-  font-weight:bold;
-}
+    /* Persistent selected style */
+    .section-title.active{
+      border-left:4px solid #b91e71;
+      font-weight:bold;
+    }
 
-/* optional icon rotation indicator */
-.section-title::after{
-  content:"+";
-}
+    /* Icon states */
+    .section-title::after{
+      content:"+";
+    }
 
-.section-title.active::after{
-  content:"−";
-}
+    .section-title.active::after{
+      content:"−";
+    }
 
-</style>
+  </style>
 </head>
 
 <body>
 
-<header>
-<span class="title">PTS Registration Exercise</span>
-<img src="logo.png" class="header-logo">
-</header>
+  <!-- =========================================================
+       SECTION: PAGE HEADER (title + logo)
+       ========================================================= -->
+  <header>
+    <span class="title">PTS Registration Exercise</span>
+    logo.png
+  </header>
 
-<div class="container">
+  <!-- =========================================================
+       SECTION: MAIN CONTENT WRAPPER
+       ========================================================= -->
+  <div class="container">
 
-<div class="sheet-card">
+    <!-- =========================================================
+         SECTION: MAIN WHITE CARD THAT HOLDS EVERYTHING
+         ========================================================= -->
+    <div class="sheet-card">
 
-<div class="sheet-header">
-<h2 id="sheetTitle"></h2>
+      <!-- =========================================================
+           SECTION: TOP BAR INSIDE CARD
+           - sheetTitle (centre)
+           - sheetSelector dropdown (left)
+           - progressText (right)
+           ========================================================= -->
+      <div class="sheet-header">
+        <h2 id="sheetTitle"></h2>
 
-<!-- ✅ NEW DROPDOWN -->
-<select id="sheetSelector">
-  <option value="">Select sheet...</option>
-</select>
+        <!-- ✅ Dropdown: user selects which Excel sheet to use -->
+        <select id="sheetSelector">
+          <option value="">Select sheet...</option>
+        </select>
 
-<span id="progressText"></span>
-</div>
+        <span id="progressText"></span>
+      </div>
 
-<div class="progress-bar">
-<div class="progress-fill" id="progressFill"></div>
-</div>
+      <!-- =========================================================
+           SECTION: PROGRESS BAR
+           - progressFill is the moving inner bar
+           ========================================================= -->
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
 
-<div id="sheetContent"></div>
+      <!-- =========================================================
+           SECTION: MAIN OUTPUT AREA
+           - JavaScript injects (renders) exercise content into this div
+           ========================================================= -->
+      <div id="sheetContent"></div>
 
-<div class="sheet-nav">
-<button id="prevBtn">Previous</button>
-<button id="nextBtn">Next</button>
-</div>
+      <!-- =========================================================
+           SECTION: NAVIGATION BUTTONS
+           - Move between exercises 1..20
+           ========================================================= -->
+      <div class="sheet-nav">
+        <button id="prevBtn">Previous</button>
+        <button id="nextBtn">Next</button>
+      </div>
 
-</div>
+    </div>
+  </div>
 
-</div>
+  <script>
+    /* =========================================================
+       SECTION: TOP-LEVEL SETTINGS / STATE
+       ========================================================= */
 
-<script>
-const TOTAL_SHEETS = 20
-let currentSheet = 0
-let selectedSheetName = "";
-let workbookRef = null;
+    // Total number of exercises per sheet (used for progress + buttons)
+    const TOTAL_SHEETS = 20
 
-/* =========================
-   STEP 1: COLUMN MAP
-========================= */
-const COLUMN_MAP = {
-  personal: [
-    { label: "CHI Number", index: 1 },
-    { label: "Post Code", index: 2 },
-    { label: "House Name/Number", index: 3 },
-    { label: "Street", index: 4 },
-    { label: "District", index: 5 },
-    { label: "Town/City", index: 6 },
-    { label: "Title", index: 7 },
-    { label: "Surname", index: 8 },
-    { label: "Forename", index: 9 },
-    { label: "DOB", index: 10 },
-    { label: "Telephone Number", index: 11 },
-    { label: "Weight", index: 12 },
-    { label: "Height", index: 13 }
-  ],
-   "Patient Needs Assessment": [
-    { label: "PNAPatient", index: 14 },
-    { label: "PNAHB", index: 15 },
-    { label: "PNAACC", index: 16 },
-    { label: "PNAACCESS", index: 17 },
-    { label: "PNA Notes", index: 18 },
-    { label: "PNA Answer 1", index: 19 },
-    { label: "PNA Answer 2", index: 20 },
-    { label: "PNA Answer 3", index: 21 },
-    { label: "PNA Answer 4", index: 22 },
-    { label: "PNA Answer 5", index: 23 },
-    { label: "PNA Answer 6", index: 24 },
-    { label: "PNA Answer 7", index: 25 },
-    { label: "PNA Answer 8", index: 26 },
-    { label: "PNA Answer 9", index: 27 },
-    { label: "PNA Answer 10", index: 28 },
-    { label: "PNA Answer 11", index: 29 },
-    { label: "PNA Answer 12", index: 30 },
-    { label: "PNA Answer 13", index: 31 },
-    { label: "PNA Answer 14", index: 32 },
-    { label: "PNA Answer 15", index: 33 },
-    { label: "PNA Answer 16", index: 34 },
-    { label: "PNA Answer 17", index: 35 },
-    { label: "PNA Answer 18", index: 36 },
-    { label: "PNA Answer 19", index: 37 },
-    { label: "PNA Answer 20", index: 38 },
-    { label: "Appeal", index: 39 },
-    { label: "Eligible", index: 40 },
-    { label: "Ineligible", index: 41 },
-    { label: "Reason", index: 42 },
-    { label: "PNA Additional Notes", index: 43 }
-  ],
-   "Journey Details": [
-    { label: "Travel Date", index: 44 },
-    { label: "End Date", index: 45 },
-    { label: "Reg journey", index: 46 },
-    { label: "Frequency", index: 47 },
-    { label: "Appt Time Mon", index: 48 },
-    { label: "Appt Time Tue", index: 49 },
-    { label: "Appt Time Wed", index: 50 },
-    { label: "Appt Time Thur", index: 51 },
-    { label: "Appt Time Fri", index: 52 },
-    { label: "Appt Time Sat", index: 53 },
-    { label: "Appt Time Sun", index: 54 },
-    { label: "Rtn Time Mon", index: 55 },
-    { label: "Rtn Time Tue", index: 56 },
-    { label: "Rtn Time Wed", index: 57 },
-    { label: "Rtn Time Thur", index: 58 },
-    { label: "Rtn Time Fri", index: 59 },
-    { label: "Rtn Time Sat", index: 60 },
-    { label: "Rtn Time Sun", index: 61 },
-    { label: "Medical", index: 62 },
-    { label: "Social", index: 63 },
-    { label: "Geo", index: 64 },
-    { label: "W (Walker)", index: 65 },
-    { label: "W1 (Walker Assist of 1)", index: 66 },
-    { label: "W2 (Walker Assist of 2)", index: 67 },
-    { label: "WC1 (Travel in Chair Assist of 1)", index: 68 },
-    { label: "WC2 (Travel in Chair Assist of 2)", index: 69 },
-    { label: "WT1 (Wheelchair Transfer Assist of 1)", index: 70 },
-    { label: "WT2 (Wheelchair Transfer Assist of 2)", index: 71 },
-    { label: "STR (Stretcher)", index: 72 },
-    { label: "A&E (A&E Ambulance)", index: 73 },
-    { label: "Out Patient", index: 74 },
-    { label: "Day Patient", index: 75 },
-    { label: "Admission", index: 76 },
-    { label: "Transfer", index: 77 },
-    { label: "Discharge", index: 78 },
-    { label: "House to House Transfer", index: 79 },
-    { label: "Home Assessment", index: 80 },
-    { label: "Relative Escort", index: 81 },
-    { label: "Medical Escort", index: 82 },
-    { label: "Private/ECR", index: 83 },
-    { label: "PickUp Post Code", index: 84 },
-    { label: "PickUp House Name/Number", index: 85 },
-    { label: "PickUp Street", index: 86 },
-    { label: "PickUp Town/City", index: 87 },
-    { label: "PickUp Hospital", index: 88 },
-    { label: "PickUp Clinic/Department", index: 89 },
-    { label: "Deliver Post Code", index: 90 },
-    { label: "Deliver House Name/Number", index: 91 },
-    { label: "Deliver Street", index: 92 },
-    { label: "Deliver Town/City", index: 93 },
-    { label: "Deliver Hospital", index: 94 },
-    { label: "Deliver Clinic/Department", index: 95 },
-    { label: "Disabilities", index: 96 },
-    { label: "Equipment", index: 97 },
-    { label: "Requirements", index: 98 },
-    { label: "Patient Note", index: 99 },
-    { label: "Journey Note", index: 100 },
-    { label: "Private Note", index: 101 }
-  ],
-  
-  "Requestee Details": [
-    { label: "Pin No", index: 102 },
-    { label: "Requestee Type", index: 103 },
-    { label: "Requestee Name", index: 104 },
-    { label: "Requestee Tel No", index: 105 },
-    { label: "Callers Name", index: 106 }
-  ]
-}
+    // Which exercise number we are currently viewing (0-based index)
+    let currentSheet = 0
 
-let SHEET_DATA = {}
+    // The name of the Excel worksheet selected in the dropdown
+    let selectedSheetName = "";
 
-/* =========================
-   ✅ NEW: CHECKBOX DETECTOR
-========================= */
-function isCheckboxValue(value){
-  return ["ý","o","1","0",1,0,true,false,"TRUE","FALSE","Yes","No"].includes(value)
-}
+    // A reference to the loaded Excel workbook (so we can reuse it)
+    let workbookRef = null;
 
-function isEmpty(value){
+    /* =========================================================
+       STEP 1: COLUMN MAP (REFERENCE ONLY)
+       =========================================================
+       This object describes what columns exist and what they mean.
+       In this file, you are mostly using row[index] directly in
+       mapRowToSections(), but this map is still useful as:
+       - documentation of what each column index represents
+       - a central place to look up indexes and labels
+       ========================================================= */
+    const COLUMN_MAP = {
+      personal: [
+        { label: "CHI Number", index: 1 },
+        { label: "Post Code", index: 2 },
+        { label: "House Name/Number", index: 3 },
+        { label: "Street", index: 4 },
+        { label: "District", index: 5 },
+        { label: "Town/City", index: 6 },
+        { label: "Title", index: 7 },
+        { label: "Surname", index: 8 },
+        { label: "Forename", index: 9 },
+        { label: "DOB", index: 10 },
+        { label: "Telephone Number", index: 11 },
+        { label: "Weight", index: 12 },
+        { label: "Height", index: 13 }
+      ],
+      "Patient Needs Assessment": [
+        { label: "PNAPatient", index: 14 },
+        { label: "PNAHB", index: 15 },
+        { label: "PNAACC", index: 16 },
+        { label: "PNAACCESS", index: 17 },
+        { label: "PNA Notes", index: 18 },
+        { label: "PNA Answer 1", index: 19 },
+        { label: "PNA Answer 2", index: 20 },
+        { label: "PNA Answer 3", index: 21 },
+        { label: "PNA Answer 4", index: 22 },
+        { label: "PNA Answer 5", index: 23 },
+        { label: "PNA Answer 6", index: 24 },
+        { label: "PNA Answer 7", index: 25 },
+        { label: "PNA Answer 8", index: 26 },
+        { label: "PNA Answer 9", index: 27 },
+        { label: "PNA Answer 10", index: 28 },
+        { label: "PNA Answer 11", index: 29 },
+        { label: "PNA Answer 12", index: 30 },
+        { label: "PNA Answer 13", index: 31 },
+        { label: "PNA Answer 14", index: 32 },
+        { label: "PNA Answer 15", index: 33 },
+        { label: "PNA Answer 16", index: 34 },
+        { label: "PNA Answer 17", index: 35 },
+        { label: "PNA Answer 18", index: 36 },
+        { label: "PNA Answer 19", index: 37 },
+        { label: "PNA Answer 20", index: 38 },
+        { label: "Appeal", index: 39 },
+        { label: "Eligible", index: 40 },
+        { label: "Ineligible", index: 41 },
+        { label: "Reason", index: 42 },
+        { label: "PNA Additional Notes", index: 43 }
+      ],
+      "Journey Details": [
+        { label: "Travel Date", index: 44 },
+        { label: "End Date", index: 45 },
+        { label: "Reg journey", index: 46 },
+        { label: "Frequency", index: 47 },
+        { label: "Appt Time Mon", index: 48 },
+        { label: "Appt Time Tue", index: 49 },
+        { label: "Appt Time Wed", index: 50 },
+        { label: "Appt Time Thur", index: 51 },
+        { label: "Appt Time Fri", index: 52 },
+        { label: "Appt Time Sat", index: 53 },
+        { label: "Appt Time Sun", index: 54 },
+        { label: "Rtn Time Mon", index: 55 },
+        { label: "Rtn Time Tue", index: 56 },
+        { label: "Rtn Time Wed", index: 57 },
+        { label: "Rtn Time Thur", index: 58 },
+        { label: "Rtn Time Fri", index: 59 },
+        { label: "Rtn Time Sat", index: 60 },
+        { label: "Rtn Time Sun", index: 61 },
+        { label: "Medical", index: 62 },
+        { label: "Social", index: 63 },
+        { label: "Geo", index: 64 },
+        { label: "W (Walker)", index: 65 },
+        { label: "W1 (Walker Assist of 1)", index: 66 },
+        { label: "W2 (Walker Assist of 2)", index: 67 },
+        { label: "WC1 (Travel in Chair Assist of 1)", index: 68 },
+        { label: "WC2 (Travel in Chair Assist of 2)", index: 69 },
+        { label: "WT1 (Wheelchair Transfer Assist of 1)", index: 70 },
+        { label: "WT2 (Wheelchair Transfer Assist of 2)", index: 71 },
+        { label: "STR (Stretcher)", index: 72 },
+        { label: "A&E (A&E Ambulance)", index: 73 },
+        { label: "Out Patient", index: 74 },
+        { label: "Day Patient", index: 75 },
+        { label: "Admission", index: 76 },
+        { label: "Transfer", index: 77 },
+        { label: "Discharge", index: 78 },
+        { label: "House to House Transfer", index: 79 },
+        { label: "Home Assessment", index: 80 },
+        { label: "Relative Escort", index: 81 },
+        { label: "Medical Escort", index: 82 },
+        { label: "Private/ECR", index: 83 },
+        { label: "PickUp Post Code", index: 84 },
+        { label: "PickUp House Name/Number", index: 85 },
+        { label: "PickUp Street", index: 86 },
+        { label: "PickUp Town/City", index: 87 },
+        { label: "PickUp Hospital", index: 88 },
+        { label: "PickUp Clinic/Department", index: 89 },
+        { label: "Deliver Post Code", index: 90 },
+        { label: "Deliver House Name/Number", index: 91 },
+        { label: "Deliver Street", index: 92 },
+        { label: "Deliver Town/City", index: 93 },
+        { label: "Deliver Hospital", index: 94 },
+        { label: "Deliver Clinic/Department", index: 95 },
+        { label: "Disabilities", index: 96 },
+        { label: "Equipment", index: 97 },
+        { label: "Requirements", index: 98 },
+        { label: "Patient Note", index: 99 },
+        { label: "Journey Note", index: 100 },
+        { label: "Private Note", index: 101 }
+      ],
 
-  // Treat unchecked checkboxes as empty
-  if(value === false) return true;
-
-  return (
-    value === null ||
-    value === undefined ||
-    value === "" ||
-    (typeof value === "string" && value.trim() === "")
-  )
-}
-/* =========================
-   STEP 3: VALUE TER (UPDATED)
-========================= */
-function formatValue(value){
-
-  if(value === null || value === undefined) return ""
-
-  // ✅ Convert Excel time (number between 0 and 1)
-  if(typeof value === "number" && value > 0 && value < 1){
-    const totalMinutes = Math.round(value * 24 * 60)
-    const hours = Math.floor(totalMinutes / 60)
-    const minutes = totalMinutes % 60
-
-    return `${hours.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")}`
-  }
-
-  // ✅ Checkbox handling
-  if(["ý","1",1,true,"TRUE","Yes"].includes(value)) return true
-  if(["o","0",0,false,"FALSE","No"].includes(value)) return false
-
-  // ✅ Date handling
-if(typeof value === "number" && value > 2000 && value < 60000){
-
-  const excelEpoch = new Date(Date.UTC(1899,11,30));
-  const date = new Date(excelEpoch.getTime() + value * 86400000);
-
-  const day = String(date.getUTCDate()).padStart(2,"0");
-  const month = String(date.getUTCMonth()+1).padStart(2,"0");
-  const year = date.getUTCFullYear();
-
-  return `${day}/${month}/${year}`;
-}
-
-  return value.toString()
-}
-/* =========================
-   STEP 2: MAP ROW → SECTIONS
-========================= */
-function mapRowToSections(row, sheetNumber){
-  return [
-    {
-      name: "Personal Info",
-      layout: "grid",
-      groups: [
-        {
-          name: "CHI",
-          fields: [
-            { label: "CHI Number", value: formatValue(row[1]) },
-          ]
-        },
-        {
-          name: "Personal",
-          fields: [
-            { label: "Title", value: formatValue(row[7]) },
-            { label: "Forename", value: formatValue(row[9]) },
-            { label: "Surname", value: formatValue(row[8]) },
-            { label: "DOB", value: formatValue(row[10]) },
-            { label: "Weight", value: formatValue(row[12]) },
-            { label: "Height", value: formatValue(row[13]) }
-          ]
-        },
-        {
-          name: "Address and Contact",
-          fields: [
-            { label: "House Name/Number", value: formatValue(row[3]) },
-            { label: "Street", value: formatValue(row[4]) },
-            { label: "District", value: formatValue(row[5]) },
-            { label: "Town/City", value: formatValue(row[6]) },
-            { label: "Post Code", value: formatValue(row[2]) },
-            { label: "Telephone Number", value: formatValue(row[11]) }
-          ]
-        }
-      ]
-    },
-    {
-      name: "Patient Needs Assessment",
-      layout: "grid",
-      groups: [
-        {
-          name: "Selected PNA",
-          fields: [
-            { label: "PNAPatient", value: formatValue(row[14]) },
-            { label: "PNAHB", value: formatValue(row[15]) },
-            { label: "PNAACC", value: formatValue(row[16]) },
-            { label: "PNAACCESS", value: formatValue(row[17]) },
-            { label: "PNA Notes", value: formatValue(row[18]) }
-          ]
-        },
-        {
-          name: "PNA Answer",
-          fields: [
-            { label: "PNA Answer 1", value: formatValue(row[19]) },
-            { label: "PNA Answer 2", value: formatValue(row[20]) },
-            { label: "PNA Answer 3", value: formatValue(row[21]) },
-            { label: "PNA Answer 4", value: formatValue(row[22]) },
-            { label: "PNA Answer 5", value: formatValue(row[23]) },
-            { label: "PNA Answer 6", value: formatValue(row[24]) },
-            { label: "PNA Answer 7", value: formatValue(row[25]) },
-            { label: "PNA Answer 8", value: formatValue(row[26]) },
-            { label: "PNA Answer 9", value: formatValue(row[27]) },
-            { label: "PNA Answer 10", value: formatValue(row[28]) },
-            { label: "PNA Answer 11", value: formatValue(row[29]) },
-            { label: "PNA Answer 12", value: formatValue(row[30]) },
-            { label: "PNA Answer 13", value: formatValue(row[31]) },
-            { label: "PNA Answer 14", value: formatValue(row[32]) },
-            { label: "PNA Answer 15", value: formatValue(row[33]) },
-            { label: "PNA Answer 16", value: formatValue(row[34]) },
-            { label: "PNA Answer 17", value: formatValue(row[35]) },
-            { label: "PNA Answer 18", value: formatValue(row[36]) },
-            { label: "PNA Answer 19", value: formatValue(row[37]) },
-            { label: "PNA Answer 20", value: formatValue(row[38]) }
-          ]
-        },
-        {
-          name: "PNA Outcome",
-          fields: [
-            { label: "Appeal", value: formatValue(row[39]) },
-            { label: "Eligible", value: formatValue(row[40]) },
-            { label: "Ineligible", value: formatValue(row[41]) },
-            { label: "Reason", value: formatValue(row[42]) },
-            { label: "PNA Additional Notes", value: formatValue(row[43]) }
-          ]
-        }
-      ]
-    },
-     {
-      name: "Journey Details",
-      layout: "grid",
-      groups: [
-        {
-          name: "Travel Details",
-          fields: [
-            { label: "Travel Date", value: formatValue(row[44]) },
-            { label: "End Date", value: formatValue(row[45]) },
-            { label: "Reg journey", value: formatValue(row[46]) },
-            { label: "Frequency", value: formatValue(row[47]) },
-            { label: "Appt Time Mon", value: formatValue(row[48]) },
-            { label: "Appt Time Tue", value: formatValue(row[49]) },
-            { label: "Appt Time Wed", value: formatValue(row[50]) },
-            { label: "Appt Time Thur", value: formatValue(row[51]) },
-            { label: "Appt Time Fri", value: formatValue(row[52]) },
-            { label: "Appt Time Sat", value: formatValue(row[53]) },
-            { label: "Appt Time Sun", value: formatValue(row[54]) },
-            { label: "Rtn Time Mon", value: formatValue(row[55]) },
-            { label: "Rtn Time Tue", value: formatValue(row[56]) },
-            { label: "Rtn Time Wed", value: formatValue(row[57]) },
-            { label: "Rtn Time Thur", value: formatValue(row[58]) },
-            { label: "Rtn Time Fri", value: formatValue(row[59]) },
-            { label: "Rtn Time Sat", value: formatValue(row[60]) },
-            { label: "Rtn Time Sun", value: formatValue(row[61]) }
-          ]
-        },
-        {
-          name: "Reason for Travel",
-          fields: [
-            { label: "Medical", value: formatValue(row[62]) },
-            { label: "Social", value: formatValue(row[63]) },
-            { label: "Geo", value: formatValue(row[64]) }
-          ]
-        },
-        {
-          name: "Mobility",
-          fields: [
-            { label: "W (Walker)", value: formatValue(row[65]) },
-            { label: "W1 (Walker Assist of 1)", value: formatValue(row[66]) },
-            { label: "W2 (Walker Assist of 2)", value: formatValue(row[67]) },
-            { label: "WC1 (Travel in Chair Assist of 1)", value: formatValue(row[68]) },
-            { label: "WC2 (Travel in Chair Assist of 2)", value: formatValue(row[69]) },
-            { label: "WT1 (Wheelchair Transfer Assist of 1)", value: formatValue(row[70]) },
-            { label: "WT2 (Wheelchair Transfer Assist of 2)", value: formatValue(row[71]) },
-            { label: "STR (Stretcher)", value: formatValue(row[72]) },
-            { label: "A&E (A&E Ambulance)", value: formatValue(row[73]) }
-          ]
-        },
-        {
-          name: "Category",
-          fields: [
-            { label: "Out Patient", value: formatValue(row[74]) },
-            { label: "Day Patient", value: formatValue(row[75]) },
-            { label: "Admission", value: formatValue(row[76]) },
-            { label: "Transfer", value: formatValue(row[77]) },
-            { label: "Discharge", value: formatValue(row[78]) },
-            { label: "House to House Transfer", value: formatValue(row[79]) },
-            { label: "Home Assessment", value: formatValue(row[80]) }
-          ]
-        },
-        {
-          name: "Method",
-          fields: [
-            { label: "Relative Escort", value: formatValue(row[81]) },
-            { label: "Medical Escort", value: formatValue(row[82]) },
-            { label: "Private/ECR", value: formatValue(row[83]) }
-          ]
-        },
-        {
-          name: "Pick Up",
-          fields: [
-            { label: "PickUp Post Code", value: formatValue(row[84]) },
-            { label: "PickUp House Name/Number", value: formatValue(row[85]) },
-            { label: "PickUp Street", value: formatValue(row[86]) },
-            { label: "PickUp Town/City", value: formatValue(row[87]) },
-            { label: "PickUp Hospital", value: formatValue(row[88]) },
-            { label: "PickUp Clinic/Department", value: formatValue(row[89]) }
-          ]
-        },
-         {
-          name: "Deliver To",
-          fields: [
-            { label: "Deliver Post Code", value: formatValue(row[90]) },
-            { label: "Deliver House Name/Number", value: formatValue(row[91]) },
-            { label: "Deliver Street", value: formatValue(row[92]) },
-            { label: "Deliver Town/City", value: formatValue(row[93]) },
-            { label: "Deliver Hospital", value: formatValue(row[94]) },
-            { label: "Deliver Clinic/Department", value: formatValue(row[95]) }
-          ]
-        },
-        {
-          name: "Notes/Requirements",
-          fields: [
-            { label: "Disabilities", value: formatValue(row[96]) },
-            { label: "Equipment", value: formatValue(row[97]) },
-            { label: "Requirements", value: formatValue(row[98]) },
-            { label: "Patient Note", value: formatValue(row[99]) },
-            { label: "Journey Note", value: formatValue(row[100]) },
-            { label: "Private Note", value: formatValue(row[101]) }
-          ]
-        }
-      ]
-    },
-     {
-      name: "Requestee Details",
-      layout: "grid",
-      groups: [
-        {
-          name: "",
-          fields: [
-            { label: "Pin No", value: formatValue(row[102]) },
-            { label: "Requestee Type", value: formatValue(row[103]) },
-            { label: "Requestee Name", value: formatValue(row[104]) },
-            { label: "Requestee Tel No", value: formatValue(row[105]) },
-            { label: "Callers Name", value: formatValue(row[106]) }
-          ]
-        }
+      "Requestee Details": [
+        { label: "Pin No", index: 102 },
+        { label: "Requestee Type", index: 103 },
+        { label: "Requestee Name", index: 104 },
+        { label: "Requestee Tel No", index: 105 },
+        { label: "Callers Name", index: 106 }
       ]
     }
-  ]
-}
-/* =========================
-   NEW: LOAD SELECTED SHEET
-========================= */
-function loadSelectedSheet(){
 
-  if(!selectedSheetName){
-    document.getElementById("sheetContent").innerHTML =
-      "<p>Please select a sheet to begin.</p>";
-    return;
-  }
+    // This will hold all exercises once Excel is loaded & processed
+    let SHEET_DATA = {}
 
-  const sheet = workbookRef.Sheets[selectedSheetName];
-
- const json = XLSX.utils.sheet_to_json(sheet, {
-  header: 1,
-  raw: true
-});
-
-  
-  SHEET_DATA = {};
-
-  json.forEach(row => {
-    const sheetNumber = row[0];
-    if(!sheetNumber) return;
-    SHEET_DATA[sheetNumber] = mapRowToSections(row, sheetNumber);
-  });
-
-  const savedExercise = localStorage.getItem("currentExercise");
-
-if(savedExercise !== null && !isNaN(savedExercise)){
-  loadSheet(parseInt(savedExercise));
-} else {
-  loadSheet(0);
-}
-}
-
-/* =========================
-   FETCH EXCEL
-========================= */
-const DATA_URL = "https://raw.githubusercontent.com/SAS-DigiLearn/SystemBot/main/data/PT_ Registration_Exercise_Data_version_7.xlsx";
-
-fetch(DATA_URL)
-  .then(res => res.arrayBuffer())
-  .then(buffer => {
-    const data = new Uint8Array(buffer);
-    const workbook = XLSX.read(data, { type: "array" });
-
-    workbookRef = workbook;
-
-    const sheetNames = workbook.SheetNames;
-
-    const selector = document.getElementById("sheetSelector");
-
-    // Populate dropdown
-    sheetNames.forEach(name => {
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      selector.appendChild(option);
-    });
-
-    // Load saved selection
-    selectedSheetName = localStorage.getItem("assignedSheet");
-
-    if(selectedSheetName && sheetNames.includes(selectedSheetName)){
-      selector.value = selectedSheetName;
-      loadSelectedSheet();
-    } else {
-      document.getElementById("sheetContent").innerHTML =
-        "<p>Please select the sheet assigned by the trainer to begin.</p>";
+    /* =========================================================
+       ✅ CHECKBOX DETECTOR
+       =========================================================
+       Excel often stores checkboxes / tick values in odd ways:
+       - "ý" or "o"
+       - 1/0
+       - TRUE/FALSE
+       - Yes/No
+       This helper checks if a value looks like it should be shown
+       as a checkbox instead of plain text.
+       ========================================================= */
+    function isCheckboxValue(value){
+      return ["ý","o","1","0",1,0,true,false,"TRUE","FALSE","Yes","No"].includes(value)
     }
 
-    // Handle user change
-selector.addEventListener("change", () => {
+    /* =========================================================
+       EMPTY VALUE DETECTOR (skip blanks)
+       =========================================================
+       This tells the renderer: "don’t show this field at all"
+       if it’s empty or only whitespace.
+       Also: treats "false" as empty so unticked checkboxes don’t appear.
+       ========================================================= */
+    function isEmpty(value){
 
-  if(!selector.value){
-    selectedSheetName = "";
-    localStorage.removeItem("assignedSheet");
-    localStorage.removeItem("currentExercise");
+      // Treat unchecked checkboxes as empty
+      if(value === false) return true;
 
-    document.getElementById("sheetContent").innerHTML =
-      "<p>Please select the sheet assigned by the trainer to begin.</p>";
-
-    document.getElementById("sheetTitle").textContent = "";
-    document.getElementById("progressText").textContent = "";
-
-    document.getElementById("prevBtn").disabled = true;
-    document.getElementById("nextBtn").disabled = true;
-
-    return;
-  }
-
-  selectedSheetName = selector.value;
-  localStorage.setItem("assignedSheet", selectedSheetName);
-  localStorage.removeItem("currentExercise");
-
-  document.getElementById("prevBtn").disabled = false;
-  document.getElementById("nextBtn").disabled = false;
-
-  loadSelectedSheet();
-});
-
-  })
-  .catch(err => console.error("Failed to load Excel file:", err));
-
-/* =========================
-   REST OF YOUR ORIGINAL JS
-   (UNCHANGED BELOW)
-========================= */
-
-function generatePlaceholderSheet(sheetNumber){
-  return SHEET_DATA[sheetNumber] || [
-    {
-      name: "Empty",
-      fields: [{ label: "Info", value: "No data loaded" }]
+      return (
+        value === null ||
+        value === undefined ||
+        value === "" ||
+        (typeof value === "string" && value.trim() === "")
+      )
     }
-  ]
-}
 
-function toggleSection(title,content){
+    /* =========================================================
+       STEP 3: VALUE FORMATTER (converts raw Excel values)
+       =========================================================
+       Excel stores:
+       - Times as decimal numbers between 0 and 1 (fraction of a day)
+       - Dates as a number counting days from a base date (1899-ish)
+       - Checkboxes as special characters or TRUE/FALSE
+       This function converts those into human-friendly display values.
+       ========================================================= */
+    function formatValue(value){
 
-  const isOpen = content.classList.contains("open")
+      // If there is no value at all, show nothing
+      if(value === null || value === undefined) return ""
 
-  const focusableRows = content.querySelectorAll(".data-row")
+      // ✅ Convert Excel time (number between 0 and 1) into HH:MM
+      if(typeof value === "number" && value > 0 && value < 1){
+        const totalMinutes = Math.round(value * 24 * 60)
+        const hours = Math.floor(totalMinutes / 60)
+        const minutes = totalMinutes % 60
 
-  if(isOpen){
-
-    content.style.maxHeight = null
-    content.classList.remove("open")
-
-    title.classList.remove("active")
-    title.setAttribute("aria-expanded","false")
-    content.setAttribute("aria-hidden","true")
-
-    // remove rows from tab order
-    focusableRows.forEach(row=>{
-      row.setAttribute("tabindex","-1")
-    })
-
-  }else{
-
-    content.classList.add("open")
-    title.classList.add("active")
-
-    title.setAttribute("aria-expanded","true")
-    content.setAttribute("aria-hidden","false")
-
-    // allow tabbing inside open section
-    focusableRows.forEach(row=>{
-      row.setAttribute("tabindex","0")
-    })
-
-    requestAnimationFrame(()=>{
-      content.style.maxHeight = content.scrollHeight + "px"
-    })
-  }
-}
-
-function loadSheet(index){
-  currentSheet = index
-  localStorage.setItem("currentExercise", index)
-  
-  document.getElementById("sheetTitle").innerHTML =
-    `${selectedSheetName} – Exercise ${index+1}`
-
-  document.getElementById("progressText").textContent =
-    (index+1) + " / " + TOTAL_SHEETS
-
-  updateProgressBar()
-  renderSheet(generatePlaceholderSheet(index+1))
-  updateButtons()
-}
-
-function renderSheet(sections){
-  const container = document.getElementById("sheetContent")
-  container.innerHTML = ""
-
-  sections.forEach((section, index) => {
-    const sectionDiv = document.createElement("div")
-    sectionDiv.className = "sheet-section"
-
-    const contentId = "section-content-" + index
-
- const title = document.createElement("button")
-title.className = "section-title"
-title.textContent = section.name
-
-title.setAttribute("aria-expanded","false")
-title.setAttribute("aria-controls",contentId)
-title.id = "section-header-" + index
-
-const content = document.createElement("div")
-content.className = "section-content"
-content.id = contentId
-
-content.setAttribute("role","region")
-content.setAttribute("aria-labelledby",title.id)
-content.setAttribute("aria-hidden","true")
-
-title.addEventListener("click", () => {
-  toggleSection(title,content)
-})
-
-title.addEventListener("keydown", e=>{
-
-  const titles = [...document.querySelectorAll(".section-title")]
-  const currentIndex = titles.indexOf(title)
-
-  if(e.key === "ArrowDown"){
-    e.preventDefault()
-    titles[currentIndex+1]?.focus()
-  }
-
-  if(e.key === "ArrowUp"){
-    e.preventDefault()
-    titles[currentIndex-1]?.focus()
-  }
-
-  if(e.key === "Home"){
-    e.preventDefault()
-    titles[0]?.focus()
-  }
-
-  if(e.key === "End"){
-    e.preventDefault()
-    titles[titles.length-1]?.focus()
-  }
-
-})
- 
-    
-    
-    // ✅ ONLY ONE RENDER BLOCK
-    if(section.groups){
-      section.groups.forEach(group => {
-
-        const groupDiv = document.createElement("div")
-        groupDiv.className = "group-block"
-
-        const groupTitle = document.createElement("div")
-        groupTitle.className = "group-title"
-        groupTitle.textContent = group.name
-
-        const groupContent = document.createElement("div")
-        groupContent.className = "group-content"
-
-        if(section.layout === "grid"){
-          groupContent.classList.add("grid")
-        }
-
-     group.fields.forEach(field => {
-
-  if(isEmpty(field.value)) return; // skip empty values
-
-  const row = document.createElement("div")
-
-  if(section.layout === "grid"){
-    row.className = "data-row grid"
-  }else{
-    row.className = "data-row"
-  }
-
-  /* ADD ACCESSIBILITY STRUCTURE */
-  row.setAttribute("role","group")
-row.setAttribute("tabindex","-1")
-
-  const labelSpan = document.createElement("span")
-  labelSpan.className = "data-label"
-  labelSpan.id = `label-${index}-${field.label.replace(/\s/g,'')}`
-  labelSpan.textContent = field.label
-
-  const valueSpan = document.createElement("span")
-  valueSpan.className = "data-value"
-
-  if(isCheckboxValue(field.value) || typeof field.value === "boolean"){
-
-    const checkbox = document.createElement("input")
-    checkbox.type = "checkbox"
-    checkbox.checked = field.value
-    checkbox.disabled = true
-
-    checkbox.setAttribute("aria-labelledby",labelSpan.id)
-
-    valueSpan.appendChild(checkbox)
-
-  }else{
-
-    valueSpan.textContent = field.value
-
-  }
-
-  row.appendChild(labelSpan)
-  row.appendChild(valueSpan)
-
-  groupContent.appendChild(row)
-
-})
-
-       if(groupContent.children.length > 0){
-  groupDiv.appendChild(groupTitle)
-  groupDiv.appendChild(groupContent)
-  content.appendChild(groupDiv)
-}
-      })
-
-    } else {
-
-      // fallback for non-grouped sections
-      const groupContent = document.createElement("div")
-
-      if(section.layout === "grid"){
-        groupContent.classList.add("grid")
+        return `${hours.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")}`
       }
 
-      section.fields.forEach(field => {
-        const row = document.createElement("div")
+      // ✅ Checkbox handling: convert many possible tick values to true/false
+      if(["ý","1",1,true,"TRUE","Yes"].includes(value)) return true
+      if(["o","0",0,false,"FALSE","No"].includes(value)) return false
 
-        if(section.layout === "grid"){
-          row.className = "data-row grid"
-        }else{
-          row.className = "data-row"
-        }
+      // ✅ Date handling:
+      // Excel stores dates as day numbers. Here we convert to DD/MM/YYYY.
+      if(typeof value === "number" && value > 2000 && value < 60000){
 
-        row.innerHTML = `
-          <span>${field.label}</span>
-          <span>${field.value}</span>
-        `
+        const excelEpoch = new Date(Date.UTC(1899,11,30));
+        const date = new Date(excelEpoch.getTime() + value * 86400000);
 
-        groupContent.appendChild(row)
-      })
+        const day = String(date.getUTCDate()).padStart(2,"0");
+        const month = String(date.getUTCMonth()+1).padStart(2,"0");
+        const year = date.getUTCFullYear();
 
-      content.appendChild(groupContent)
+        return `${day}/${month}/${year}`;
+      }
+
+      // Default: show the value as text
+      return value.toString()
     }
 
-  if(content.children.length > 0){
-  sectionDiv.appendChild(title)
-  sectionDiv.appendChild(content)
-  container.appendChild(sectionDiv)
-}
-  })
-}
+    /* =========================================================
+       STEP 2: MAP ROW → SECTIONS (this builds the UI structure)
+       =========================================================
+       Each Excel ROW represents one "exercise".
+       This function takes:
+       - row: an array of cell values
+       - sheetNumber: the exercise number
+       And returns a structured set of sections/groups/fields that
+       the renderer can display as expandable accordion sections.
+       ========================================================= */
+    function mapRowToSections(row, sheetNumber){
+      return [
+        {
+          name: "Personal Info",     // section heading shown to user
+          layout: "grid",            // display in grid layout
+          groups: [
+            {
+              name: "CHI",
+              fields: [
+                { label: "CHI Number", value: formatValue(row[1]) },
+              ]
+            },
+            {
+              name: "Personal",
+              fields: [
+                { label: "Title", value: formatValue(row[7]) },
+                { label: "Forename", value: formatValue(row[9]) },
+                { label: "Surname", value: formatValue(row[8]) },
+                { label: "DOB", value: formatValue(row[10]) },
+                { label: "Weight", value: formatValue(row[12]) },
+                { label: "Height", value: formatValue(row[13]) }
+              ]
+            },
+            {
+              name: "Address and Contact",
+              fields: [
+                { label: "House Name/Number", value: formatValue(row[3]) },
+                { label: "Street", value: formatValue(row[4]) },
+                { label: "District", value: formatValue(row[5]) },
+                { label: "Town/City", value: formatValue(row[6]) },
+                { label: "Post Code", value: formatValue(row[2]) },
+                { label: "Telephone Number", value: formatValue(row[11]) }
+              ]
+            }
+          ]
+        },
+        {
+          name: "Patient Needs Assessment",
+          layout: "grid",
+          groups: [
+            {
+              name: "Selected PNA",
+              fields: [
+                { label: "PNAPatient", value: formatValue(row[14]) },
+                { label: "PNAHB", value: formatValue(row[15]) },
+                { label: "PNAACC", value: formatValue(row[16]) },
+                { label: "PNAACCESS", value: formatValue(row[17]) },
+                { label: "PNA Notes", value: formatValue(row[18]) }
+              ]
+            },
+            {
+              name: "PNA Answer",
+              fields: [
+                { label: "PNA Answer 1", value: formatValue(row[19]) },
+                { label: "PNA Answer 2", value: formatValue(row[20]) },
+                { label: "PNA Answer 3", value: formatValue(row[21]) },
+                { label: "PNA Answer 4", value: formatValue(row[22]) },
+                { label: "PNA Answer 5", value: formatValue(row[23]) },
+                { label: "PNA Answer 6", value: formatValue(row[24]) },
+                { label: "PNA Answer 7", value: formatValue(row[25]) },
+                { label: "PNA Answer 8", value: formatValue(row[26]) },
+                { label: "PNA Answer 9", value: formatValue(row[27]) },
+                { label: "PNA Answer 10", value: formatValue(row[28]) },
+                { label: "PNA Answer 11", value: formatValue(row[29]) },
+                { label: "PNA Answer 12", value: formatValue(row[30]) },
+                { label: "PNA Answer 13", value: formatValue(row[31]) },
+                { label: "PNA Answer 14", value: formatValue(row[32]) },
+                { label: "PNA Answer 15", value: formatValue(row[33]) },
+                { label: "PNA Answer 16", value: formatValue(row[34]) },
+                { label: "PNA Answer 17", value: formatValue(row[35]) },
+                { label: "PNA Answer 18", value: formatValue(row[36]) },
+                { label: "PNA Answer 19", value: formatValue(row[37]) },
+                { label: "PNA Answer 20", value: formatValue(row[38]) }
+              ]
+            },
+            {
+              name: "PNA Outcome",
+              fields: [
+                { label: "Appeal", value: formatValue(row[39]) },
+                { label: "Eligible", value: formatValue(row[40]) },
+                { label: "Ineligible", value: formatValue(row[41]) },
+                { label: "Reason", value: formatValue(row[42]) },
+                { label: "PNA Additional Notes", value: formatValue(row[43]) }
+              ]
+            }
+          ]
+        },
+        {
+          name: "Journey Details",
+          layout: "grid",
+          groups: [
+            {
+              name: "Travel Details",
+              fields: [
+                { label: "Travel Date", value: formatValue(row[44]) },
+                { label: "End Date", value: formatValue(row[45]) },
+                { label: "Reg journey", value: formatValue(row[46]) },
+                { label: "Frequency", value: formatValue(row[47]) },
+                { label: "Appt Time Mon", value: formatValue(row[48]) },
+                { label: "Appt Time Tue", value: formatValue(row[49]) },
+                { label: "Appt Time Wed", value: formatValue(row[50]) },
+                { label: "Appt Time Thur", value: formatValue(row[51]) },
+                { label: "Appt Time Fri", value: formatValue(row[52]) },
+                { label: "Appt Time Sat", value: formatValue(row[53]) },
+                { label: "Appt Time Sun", value: formatValue(row[54]) },
+                { label: "Rtn Time Mon", value: formatValue(row[55]) },
+                { label: "Rtn Time Tue", value: formatValue(row[56]) },
+                { label: "Rtn Time Wed", value: formatValue(row[57]) },
+                { label: "Rtn Time Thur", value: formatValue(row[58]) },
+                { label: "Rtn Time Fri", value: formatValue(row[59]) },
+                { label: "Rtn Time Sat", value: formatValue(row[60]) },
+                { label: "Rtn Time Sun", value: formatValue(row[61]) }
+              ]
+            },
+            {
+              name: "Reason for Travel",
+              fields: [
+                { label: "Medical", value: formatValue(row[62]) },
+                { label: "Social", value: formatValue(row[63]) },
+                { label: "Geo", value: formatValue(row[64]) }
+              ]
+            },
+            {
+              name: "Mobility",
+              fields: [
+                { label: "W (Walker)", value: formatValue(row[65]) },
+                { label: "W1 (Walker Assist of 1)", value: formatValue(row[66]) },
+                { label: "W2 (Walker Assist of 2)", value: formatValue(row[67]) },
+                { label: "WC1 (Travel in Chair Assist of 1)", value: formatValue(row[68]) },
+                { label: "WC2 (Travel in Chair Assist of 2)", value: formatValue(row[69]) },
+                { label: "WT1 (Wheelchair Transfer Assist of 1)", value: formatValue(row[70]) },
+                { label: "WT2 (Wheelchair Transfer Assist of 2)", value: formatValue(row[71]) },
+                { label: "STR (Stretcher)", value: formatValue(row[72]) },
+                { label: "A&E (A&E Ambulance)", value: formatValue(row[73]) }
+              ]
+            },
+            {
+              name: "Category",
+              fields: [
+                { label: "Out Patient", value: formatValue(row[74]) },
+                { label: "Day Patient", value: formatValue(row[75]) },
+                { label: "Admission", value: formatValue(row[76]) },
+                { label: "Transfer", value: formatValue(row[77]) },
+                { label: "Discharge", value: formatValue(row[78]) },
+                { label: "House to House Transfer", value: formatValue(row[79]) },
+                { label: "Home Assessment", value: formatValue(row[80]) }
+              ]
+            },
+            {
+              name: "Method",
+              fields: [
+                { label: "Relative Escort", value: formatValue(row[81]) },
+                { label: "Medical Escort", value: formatValue(row[82]) },
+                { label: "Private/ECR", value: formatValue(row[83]) }
+              ]
+            },
+            {
+              name: "Pick Up",
+              fields: [
+                { label: "PickUp Post Code", value: formatValue(row[84]) },
+                { label: "PickUp House Name/Number", value: formatValue(row[85]) },
+                { label: "PickUp Street", value: formatValue(row[86]) },
+                { label: "PickUp Town/City", value: formatValue(row[87]) },
+                { label: "PickUp Hospital", value: formatValue(row[88]) },
+                { label: "PickUp Clinic/Department", value: formatValue(row[89]) }
+              ]
+            },
+            {
+              name: "Deliver To",
+              fields: [
+                { label: "Deliver Post Code", value: formatValue(row[90]) },
+                { label: "Deliver House Name/Number", value: formatValue(row[91]) },
+                { label: "Deliver Street", value: formatValue(row[92]) },
+                { label: "Deliver Town/City", value: formatValue(row[93]) },
+                { label: "Deliver Hospital", value: formatValue(row[94]) },
+                { label: "Deliver Clinic/Department", value: formatValue(row[95]) }
+              ]
+            },
+            {
+              name: "Notes/Requirements",
+              fields: [
+                { label: "Disabilities", value: formatValue(row[96]) },
+                { label: "Equipment", value: formatValue(row[97]) },
+                { label: "Requirements", value: formatValue(row[98]) },
+                { label: "Patient Note", value: formatValue(row[99]) },
+                { label: "Journey Note", value: formatValue(row[100]) },
+                { label: "Private Note", value: formatValue(row[101]) }
+              ]
+            }
+          ]
+        },
+        {
+          name: "Requestee Details",
+          layout: "grid",
+          groups: [
+            {
+              name: "",
+              fields: [
+                { label: "Pin No", value: formatValue(row[102]) },
+                { label: "Requestee Type", value: formatValue(row[103]) },
+                { label: "Requestee Name", value: formatValue(row[104]) },
+                { label: "Requestee Tel No", value: formatValue(row[105]) },
+                { label: "Callers Name", value: formatValue(row[106]) }
+              ]
+            }
+          ]
+        }
+      ]
+    }
 
+    /* =========================================================
+       NEW: LOAD SELECTED SHEET (the dropdown-driven loader)
+       =========================================================
+       What this does:
+       1) If no sheet is chosen → show a message and stop.
+       2) If a sheet IS chosen:
+          - Read the sheet into a plain JS array (json)
+          - Convert each row into UI sections (mapRowToSections)
+          - Save it into SHEET_DATA keyed by exercise number
+          - Then load the last viewed exercise from localStorage (if any)
+       ========================================================= */
+    function loadSelectedSheet(){
 
-function updateProgressBar(){
-  const percent = ((currentSheet+1)/TOTAL_SHEETS)*100
-  document.getElementById("progressFill").style.width = percent + "%"
-}
+      // If nothing selected, tell user to pick a sheet
+      if(!selectedSheetName){
+        document.getElementById("sheetContent").innerHTML =
+          "<p>Please select a sheet to begin.</p>";
+        return;
+      }
 
-function updateButtons(){
-  document.getElementById("prevBtn").disabled = currentSheet === 0
-  document.getElementById("nextBtn").disabled = currentSheet === TOTAL_SHEETS - 1
-}
+      // Get the chosen worksheet from the workbook
+      const sheet = workbookRef.Sheets[selectedSheetName];
 
-document.getElementById("nextBtn").addEventListener("click",()=>{
-  if(currentSheet < TOTAL_SHEETS-1){
-    currentSheet++
-    loadSheet(currentSheet)
-  }
-})
+      // Convert worksheet into a 2D array (rows/columns)
+      // header:1 means "treat everything as raw rows"
+      // raw:true means "don’t auto-convert"
+      const json = XLSX.utils.sheet_to_json(sheet, {
+        header: 1,
+        raw: true
+      });
 
-document.getElementById("prevBtn").addEventListener("click",()=>{
-  if(currentSheet>0){
-    currentSheet--
-    loadSheet(currentSheet)
-  }
-})
-</script>
+      // Clear old data and rebuild from this selected sheet
+      SHEET_DATA = {};
+
+      // Each row becomes one exercise
+      json.forEach(row => {
+        const sheetNumber = row[0];   // first column contains exercise number
+        if(!sheetNumber) return;      // skip blank rows
+        SHEET_DATA[sheetNumber] = mapRowToSections(row, sheetNumber);
+      });
+
+      // If the user has previously saved where they were, restore it
+      const savedExercise = localStorage.getItem("currentExercise");
+
+      if(savedExercise !== null && !isNaN(savedExercise)){
+        loadSheet(parseInt(savedExercise));
+      } else {
+        loadSheet(0);
+      }
+    }
+
+    /* =========================================================
+       FETCH EXCEL (download the workbook from GitHub)
+       =========================================================
+       What happens here:
+       1) Download the Excel file (fetch)
+       2) Convert it into a binary array
+       3) Read that array into a workbook object (XLSX.read)
+       4) Populate the dropdown with sheet names
+       5) Restore previous selection from localStorage if available
+       ========================================================= */
+    const DATA_URL = "https://raw.githubusercontent.com/SAS-DigiLearn/SystemBot/main/data/PT_ Registration_Exercise_Data_version_7.xlsx";
+
+    fetch(DATA_URL)
+      .then(res => res.arrayBuffer())                 // get file as raw bytes
+      .then(buffer => {
+        const data = new Uint8Array(buffer);          // convert bytes to typed array
+        const workbook = XLSX.read(data, { type: "array" }); // parse Excel
+
+        workbookRef = workbook;
+
+        // All worksheet names inside the Excel file
+        const sheetNames = workbook.SheetNames;
+
+        // The dropdown element in the HTML
+        const selector = document.getElementById("sheetSelector");
+
+        // Add each sheet name as a dropdown option
+        sheetNames.forEach(name => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          selector.appendChild(option);
+        });
+
+        // Load saved selection (trainer-assigned sheet) if it exists
+        selectedSheetName = localStorage.getItem("assignedSheet");
+
+        if(selectedSheetName && sheetNames.includes(selectedSheetName)){
+          selector.value = selectedSheetName;
+          loadSelectedSheet();
+        } else {
+          document.getElementById("sheetContent").innerHTML =
+            "<p>Please select the sheet assigned by the trainer to begin.</p>";
+        }
+
+        /* =========================================================
+           DROPDOWN CHANGE HANDLER
+           =========================================================
+           If the user changes sheet:
+           - If they choose blank → reset everything and disable nav
+           - If they choose a real sheet → save choice and load exercises
+           ========================================================= */
+        selector.addEventListener("change", () => {
+
+          // If user selects the blank option
+          if(!selector.value){
+            selectedSheetName = "";
+            localStorage.removeItem("assignedSheet");
+            localStorage.removeItem("currentExercise");
+
+            document.getElementById("sheetContent").innerHTML =
+              "<p>Please select the sheet assigned by the trainer to begin.</p>";
+
+            // Clear UI text
+            document.getElementById("sheetTitle").textContent = "";
+            document.getElementById("progressText").textContent = "";
+
+            // Disable navigation because there is no sheet loaded
+            document.getElementById("prevBtn").disabled = true;
+            document.getElementById("nextBtn").disabled = true;
+
+            return;
+          }
+
+          // Otherwise, save selected sheet and load it
+          selectedSheetName = selector.value;
+          localStorage.setItem("assignedSheet", selectedSheetName);
+          localStorage.removeItem("currentExercise");
+
+          // Enable navigation now that a sheet exists
+          document.getElementById("prevBtn").disabled = false;
+          document.getElementById("nextBtn").disabled = false;
+
+          loadSelectedSheet();
+        });
+
+      })
+      .catch(err => console.error("Failed to load Excel file:", err));
+
+    /* =========================================================
+       REST OF YOUR ORIGINAL JS (UNCHANGED BELOW)
+       ========================================================= */
+
+    // If an exercise has no data, return a default placeholder section
+    function generatePlaceholderSheet(sheetNumber){
+      return SHEET_DATA[sheetNumber] || [
+        {
+          name: "Empty",
+          fields: [{ label: "Info", value: "No data loaded" }]
+        }
+      ]
+    }
+
+    /* =========================================================
+       ACCORDION TOGGLE (open/close a section)
+       =========================================================
+       - Adds/removes CSS classes to expand/collapse the section
+       - Updates ARIA attributes for screen readers
+       - Controls tab order so keyboard users don’t tab into hidden content
+       ========================================================= */
+    function toggleSection(title,content){
+
+      const isOpen = content.classList.contains("open")
+
+      // All rows inside the section (used for keyboard focus management)
+      const focusableRows = content.querySelectorAll(".data-row")
+
+      if(isOpen){
+
+        // Close the section
+        content.style.maxHeight = null
+        content.classList.remove("open")
+
+        title.classList.remove("active")
+        title.setAttribute("aria-expanded","false")
+        content.setAttribute("aria-hidden","true")
+
+        // remove rows from tab order
+        focusableRows.forEach(row=>{
+          row.setAttribute("tabindex","-1")
+        })
+
+      }else{
+
+        // Open the section
+        content.classList.add("open")
+        title.classList.add("active")
+
+        title.setAttribute("aria-expanded","true")
+        content.setAttribute("aria-hidden","false")
+
+        // allow tabbing inside open section
+        focusableRows.forEach(row=>{
+          row.setAttribute("tabindex","0")
+        })
+
+        // Wait for layout, then set maxHeight so CSS animation works
+        requestAnimationFrame(()=>{
+          content.style.maxHeight = content.scrollHeight + "px"
+        })
+      }
+    }
+
+    /* =========================================================
+       LOAD AN EXERCISE (by index)
+       =========================================================
+       - Saves current exercise index
+       - Updates heading and progress text
+       - Renders the correct exercise data into the page
+       - Updates progress bar + button enable/disable
+       ========================================================= */
+    function loadSheet(index){
+      currentSheet = index
+      localStorage.setItem("currentExercise", index)
+
+      // Display header like: "SheetName – Exercise 1"
+      document.getElementById("sheetTitle").innerHTML =
+        `${selectedSheetName} – Exercise ${index+1}`
+
+      // Display progress like: "1 / 20"
+      document.getElementById("progressText").textContent =
+        (index+1) + " / " + TOTAL_SHEETS
+
+      updateProgressBar()
+      renderSheet(generatePlaceholderSheet(index+1))
+      updateButtons()
+    }
+
+    /* =========================================================
+       RENDER SHEET (build the HTML dynamically)
+       =========================================================
+       This is the main UI builder:
+       - Creates a section container for each section
+       - Creates a clickable title button (accordion header)
+       - Creates content blocks and rows from the data
+       - Skips empty values so the UI stays clean
+       ========================================================= */
+    function renderSheet(sections){
+      const container = document.getElementById("sheetContent")
+      container.innerHTML = ""
+
+      sections.forEach((section, index) => {
+        const sectionDiv = document.createElement("div")
+        sectionDiv.className = "sheet-section"
+
+        const contentId = "section-content-" + index
+
+        // Section header button
+        const title = document.createElement("button")
+        title.className = "section-title"
+        title.textContent = section.name
+
+        // ARIA for accessibility (screen reader friendliness)
+        title.setAttribute("aria-expanded","false")
+        title.setAttribute("aria-controls",contentId)
+        title.id = "section-header-" + index
+
+        // Expandable content area
+        const content = document.createElement("div")
+        content.className = "section-content"
+        content.id = contentId
+
+        content.setAttribute("role","region")
+        content.setAttribute("aria-labelledby",title.id)
+        content.setAttribute("aria-hidden","true")
+
+        // Click toggles open/close
+        title.addEventListener("click", () => {
+          toggleSection(title,content)
+        })
+
+        // Keyboard navigation between section headers
+        title.addEventListener("keydown", e=>{
+
+          const titles = [...document.querySelectorAll(".section-title")]
+          const currentIndex = titles.indexOf(title)
+
+          if(e.key === "ArrowDown"){
+            e.preventDefault()
+            titles[currentIndex+1]?.focus()
+          }
+
+          if(e.key === "ArrowUp"){
+            e.preventDefault()
+            titles[currentIndex-1]?.focus()
+          }
+
+          if(e.key === "Home"){
+            e.preventDefault()
+            titles[0]?.focus()
+          }
+
+          if(e.key === "End"){
+            e.preventDefault()
+            titles[titles.length-1]?.focus()
+          }
+
+        })
+
+        /* =========================================================
+           RENDER GROUPS (if section has groups)
+           ========================================================= */
+        if(section.groups){
+          section.groups.forEach(group => {
+
+            const groupDiv = document.createElement("div")
+            groupDiv.className = "group-block"
+
+            const groupTitle = document.createElement("div")
+            groupTitle.className = "group-title"
+            groupTitle.textContent = group.name
+
+            const groupContent = document.createElement("div")
+            groupContent.className = "group-content"
+
+            // If the section uses grid layout, the group does too
+            if(section.layout === "grid"){
+              groupContent.classList.add("grid")
+            }
+
+            // Render each field (label + value row)
+            group.fields.forEach(field => {
+
+              // Don’t show empty values
+              if(isEmpty(field.value)) return; // skip empty values
+
+              const row = document.createElement("div")
+
+              // Different row styles depending on layout
+              if(section.layout === "grid"){
+                row.className = "data-row grid"
+              }else{
+                row.className = "data-row"
+              }
+
+              /* Accessibility: make each row a group and control tabbing */
+              row.setAttribute("role","group")
+              row.setAttribute("tabindex","-1")
+
+              const labelSpan = document.createElement("span")
+              labelSpan.className = "data-label"
+              labelSpan.id = `label-${index}-${field.label.replace(/\s/g,'')}`
+              labelSpan.textContent = field.label
+
+              const valueSpan = document.createElement("span")
+              valueSpan.className = "data-value"
+
+              // If it looks like a checkbox value, render a checkbox indicator
+              if(isCheckboxValue(field.value) || typeof field.value === "boolean"){
+
+                const checkbox = document.createElement("input")
+                checkbox.type = "checkbox"
+                checkbox.checked = field.value
+                checkbox.disabled = true
+
+                // Ties the checkbox to its label for screen readers
+                checkbox.setAttribute("aria-labelledby",labelSpan.id)
+
+                valueSpan.appendChild(checkbox)
+
+              }else{
+                // Otherwise render plain text
+                valueSpan.textContent = field.value
+              }
+
+              row.appendChild(labelSpan)
+              row.appendChild(valueSpan)
+
+              groupContent.appendChild(row)
+
+            })
+
+            // Only add the group if it actually contains visible rows
+            if(groupContent.children.length > 0){
+              groupDiv.appendChild(groupTitle)
+              groupDiv.appendChild(groupContent)
+              content.appendChild(groupDiv)
+            }
+          })
+
+        } else {
+
+          /* =========================================================
+             FALLBACK: NON-GROUPED SECTIONS
+             (Used if a section has "fields" directly rather than "groups")
+             ========================================================= */
+          const groupContent = document.createElement("div")
+
+          if(section.layout === "grid"){
+            groupContent.classList.add("grid")
+          }
+
+          section.fields.forEach(field => {
+            const row = document.createElement("div")
+
+            if(section.layout === "grid"){
+              row.className = "data-row grid"
+            }else{
+              row.className = "data-row"
+            }
+
+            row.innerHTML = `
+              <span>${field.label}</span>
+              <span>${field.value}</span>
+            `
+
+            groupContent.appendChild(row)
+          })
+
+          content.appendChild(groupContent)
+        }
+
+        // Only render a whole section if it has content
+        if(content.children.length > 0){
+          sectionDiv.appendChild(title)
+          sectionDiv.appendChild(content)
+          container.appendChild(sectionDiv)
+        }
+      })
+    }
+
+    /* =========================================================
+       PROGRESS BAR UPDATE
+       =========================================================
+       Sets fill width based on current exercise position
+       ========================================================= */
+    function updateProgressBar(){
+      const percent = ((currentSheet+1)/TOTAL_SHEETS)*100
+      document.getElementById("progressFill").style.width = percent + "%"
+    }
+
+    /* =========================================================
+       BUTTON ENABLE/DISABLE LOGIC
+       =========================================================
+       Prevents going past first exercise or beyond last
+       ========================================================= */
+    function updateButtons(){
+      document.getElementById("prevBtn").disabled = currentSheet === 0
+      document.getElementById("nextBtn").disabled = currentSheet === TOTAL_SHEETS - 1
+    }
+
+    /* =========================================================
+       NEXT BUTTON CLICK
+       ========================================================= */
+    document.getElementById("nextBtn").addEventListener("click",()=>{
+      if(currentSheet < TOTAL_SHEETS-1){
+        currentSheet++
+        loadSheet(currentSheet)
+      }
+    })
+
+    /* =========================================================
+       PREVIOUS BUTTON CLICK
+       ========================================================= */
+    document.getElementById("prevBtn").addEventListener("click",()=>{
+      if(currentSheet>0){
+        currentSheet--
+        loadSheet(currentSheet)
+      }
+    })
+  </script>
 
 </body>
 </html>
