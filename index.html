@@ -8,12 +8,25 @@
 
 <style>
 
+/* =========================================================
+       SECTION: GLOBAL PAGE STYLES
+       - Sets the default font, removes browser margins,
+         and sets the page background colour
+========================================================= */
+
 body{
 font-family:Arial,sans-serif;
 margin:0;
 background:#f5f6fa;
 }
 
+ 
+/* =========================================================
+       SECTION: HEADER AREA (top bar)
+       - White header with a title on the left and logo on the right
+   ========================================================= */
+ 
+  
 header{
 background:#ffffff;
 padding:20px;
@@ -32,6 +45,12 @@ color:#b91e71;
 .header-logo{
 height:60px;
 }
+
+
+/* =========================================================
+       SECTION: MAIN PAGE CONTAINER
+       - Keeps content centred and adds spacing
+   ========================================================= */
   
 .container{
 padding:25px;
@@ -39,6 +58,12 @@ max-width:1000px;
 margin:auto;
 }
 
+
+/* =========================================================
+       SECTION: MAIN "CARD" THAT HOLDS THE EXERCISE UI
+   ========================================================= */
+  
+  
 .sheet-card{
 background:white;
 padding:30px;
@@ -46,6 +71,12 @@ border-radius:14px;
 box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
 
+
+ /* =========================================================
+       SECTION: HEADER INSIDE THE CARD (title, dropdown, progress text)
+    ========================================================= */
+
+  
 .sheet-header{
  position: relative;
   display: flex;
@@ -53,7 +84,12 @@ box-shadow:0 2px 10px rgba(0,0,0,0.08);
   margin-bottom: 20px;
 }
 
-/* NEW: selector styling */
+
+/* =========================================================
+       SECTION: DROPDOWN (sheet selector)
+       - The user chooses which Excel worksheet to use
+   ========================================================= */
+
 #sheetSelector{
 padding: 10px;
 border-radius: 8px;
@@ -67,6 +103,12 @@ margin-right: auto;
   outline: none;
 }
 
+
+/* =========================================================
+       SECTION: MAIN TITLE (sheet + exercise number)
+       - Positioned dead centre of the sheet-header bar
+   ========================================================= */
+
 #sheetTitle{
   position: absolute;
   left: 50%;
@@ -76,10 +118,21 @@ margin-right: auto;
   color: #b91e71;
   }
 
+
+/* =========================================================
+       SECTION: PROGRESS TEXT (e.g., "3 / 20")
+       - Floats to the right side of the sheet-header bar
+   ========================================================= */
+
 #progressText{
 margin-left: auto;
 }
 
+
+/* =========================================================
+       SECTION: PROGRESS BAR (visual progress)
+   ========================================================= */  
+  
 .progress-bar{
 height:8px;
 background:#eee;
@@ -95,10 +148,17 @@ width:0%;
 transition:width 0.3s;
 }
 
+
+/* =========================================================
+       SECTION: "ACCORDION" SECTIONS (expand/collapse blocks)
+   ========================================================= */
+
+  
 .sheet-section{
 margin-bottom:25px;
 }
 
+/* The clickable button that opens/closes a section */  
 .section-title{
 font-size:16px;
 font-weight:bold;
@@ -115,21 +175,32 @@ border:none;
 text-align:left;
 }
 
+/* The plus/minus icon that appears after the title text */  
 .section-title::after{
 content:"+";
 font-size:18px;
 transition:transform 0.25s;
 }
 
+
+/* When active/open, show minus instead of plus */  
 .section-title.active::after{
 content:"−";
 }
 
+
+/* Keyboard focus style */  
 .section-title:focus{
 outline:3px solid #b91e71;
 outline-offset:2px;
 }
 
+
+
+/* =========================================================
+       SECTION: ROW STYLES (label/value lines)
+   ========================================================= */
+  
 .data-row{
 display:flex;
 justify-content:space-between;
@@ -137,7 +208,7 @@ padding:8px 0;
 border-bottom:1px solid #eee;
 }
 
-/* EXISTING layout styles */
+
 .data-row.two-column{
 justify-content: space-between;
 font-weight: 500;
@@ -157,13 +228,19 @@ padding:4px 0;
 color:#666;
 }
 
-/* NEW: GRID LAYOUT */
+
+/* =========================================================
+       SECTION: GRID LAYOUT (cards/columns)
+       - Used when a section is set to layout: "grid"
+  ========================================================= */
+
 .section-content.grid{
 display:grid;
 grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 gap:10px 20px;
 }
 
+/* In grid mode each row becomes a “mini card” */  
 .data-row.grid{
 display:flex;
 flex-direction:column;
@@ -183,6 +260,12 @@ font-weight:bold;
 color:#333;
 }
 
+
+
+/* =========================================================
+       SECTION: NEXT / PREVIOUS NAVIGATION BUTTONS
+   ========================================================= */
+  
 .sheet-nav{
 display:flex;
 justify-content:space-between;
@@ -208,6 +291,11 @@ background:#ccc;
 cursor:not-allowed;
 }
 
+
+/* =========================================================
+       SECTION: ACCORDION LOOK & FEEL + ACCESSIBILITY
+   ========================================================= */
+  
 .section-title{
   background:white;
   color:#b91e71;
@@ -220,7 +308,8 @@ cursor:not-allowed;
   box-shadow:0 0 0 4px rgba(185,30,113,0.2);
   background:#fff0f6;
 }
-  
+
+/* Section wrapper style */  
 .sheet-section{
 background:#fafafa;
 border-radius:10px;
@@ -234,6 +323,8 @@ transition:box-shadow 0.2s ease;
 box-shadow:0 4px 12px rgba(0,0,0,0.05);
 }
 
+
+/* The hidden/expandable content area */  
 .section-content{
 max-height:0;
 overflow:hidden;
@@ -242,11 +333,19 @@ padding:0 18px;
 background:#fafafa;
 }
 
+/* When opened, allow it to expand */  
 .section-content.open{
 padding-bottom:10px;
 max-height:100%;
 }
 
+
+
+/* =========================================================
+       SECTION: GROUP BLOCKS INSIDE A SECTION
+       - Example: "Address and Contact" inside "Personal Info"
+   ========================================================= */
+  
 .group-block{
   margin-bottom: 5px;
   margin-top: 10px;
@@ -275,6 +374,11 @@ max-height:100%;
 }
 
 
+/* =========================================================
+       SECTION: CHECKBOX DISPLAY STYLES
+       - These are not real clickable checkboxes (pointer-events none)
+       - They are visual indicators for Yes/No style values
+   ========================================================= */
 
 .data-row input[type="checkbox"] {
   -webkit-appearance: none;
@@ -297,6 +401,7 @@ max-height:100%;
   color: #b91e71; /* pink checkmark */
 }
 
+/* A badge style (not currently used in markup here, but available) */  
 .sheet-badge{
   background:#ffe5f2;
   color:#8C1756;
@@ -306,7 +411,7 @@ max-height:100%;
   margin-left:10px;
 }
 
-/* Making accessibility adjustments */
+
 .section-title:focus-visible{
   outline:3px solid #b91e71;
   outline-offset:3px;
@@ -319,7 +424,7 @@ max-height:100%;
   font-weight:bold;
 }
 
-/* optional icon rotation indicator */
+/* Icon states */
 .section-title::after{
   content:"+";
 }
