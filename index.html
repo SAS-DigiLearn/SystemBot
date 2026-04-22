@@ -6,12 +6,13 @@
 
 <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
-  script-src 'self' https://cdn.jsdelivr.net;
+  script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
   connect-src 'self' https://raw.githubusercontent.com https:;
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: blob:;
   object-src 'none';
   base-uri 'self';
+  frame-ancestors 'none';
 ">
        
 <title>PTS Exercises</title>
