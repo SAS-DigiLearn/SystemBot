@@ -492,7 +492,7 @@ function safeString(value){
 
 // STRICT whitelist validation
 function isValidSheet(name, sheetNames){
-  return sheetNames.includes(name);
+  return typeof name === "string" && sheetNames.includes(name);
 }
 
 function isChecked(value){
