@@ -480,6 +480,29 @@ let currentSheet = 0
 let selectedSheetName = "";
 let workbookRef = null;
 
+
+function cleanText(value){
+  if(typeof value !== "string") return value;
+  return value.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function safeString(value){
+  return value == null ? "" : String(value);
+}
+
+// STRICT whitelist validation
+function isValidSheet(name, sheetNames){
+  return sheetNames.includes(name);
+}
+
+function isChecked(value){
+  return value === true ||
+         value === 1 ||
+         value === "1" ||
+         value === "TRUE" ||
+         value === "Yes";
+}
+
 /* =========================
    STEP 1: COLUMN MAP
 ========================= */
