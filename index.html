@@ -931,8 +931,17 @@ fetch(DATA_URL)
     });
 
     // Load saved selection
-    selectedSheetName = localStorage.getItem("assignedSheet");
+function sanitizeText(str){
+  return String(str)
+    .replace(/[<>]/g, "")
+    .trim();
+}
 
+selectedSheetName = localStorage.getItem("assignedSheet");
+
+if(!sheetNames.includes(selectedSheetName)){
+  selectedSheetName = "";
+}         
     if(selectedSheetName && sheetNames.includes(selectedSheetName)){
       selector.value = selectedSheetName;
       loadSelectedSheet();
@@ -1030,8 +1039,8 @@ function loadSheet(index){
   currentSheet = index
   localStorage.setItem("currentExercise", index)
   
-  document.getElementById("sheetTitle").innerHTML =
-    `${selectedSheetName} – Exercise ${index+1}`
+  document.getElementById("sheetTitle").textContent =
+  `${selectedSheetName} – Exercise ${index+1}`
 
   document.getElementById("progressText").textContent =
     (index+1) + " / " + TOTAL_SHEETS
@@ -1133,7 +1142,13 @@ row.setAttribute("tabindex","-1")
 
   const labelSpan = document.createElement("span")
   labelSpan.className = "data-label"
-  labelSpan.id = `label-${index}-${field.label.replace(/\s/g,'')}`
+  function safeId(str){
+  return String(str)
+    .replace(/[^a-zA-Z0-9]/g,'')
+    .slice(0,30);
+}
+
+labelSpan.id = `label-${index}-${safeId(field.label)}`
   labelSpan.textContent = field.label
 
   const valueSpan = document.createElement("span")
@@ -1188,10 +1203,14 @@ row.setAttribute("tabindex","-1")
           row.className = "data-row"
         }
 
-        row.innerHTML = `
-          <span>${field.label}</span>
-          <span>${field.value}</span>
-        `
+       const labelSpan = document.createElement("span")
+labelSpan.textContent = field.label
+
+const valueSpan = document.createElement("span")
+valueSpan.textContent = field.value
+
+row.appendChild(labelSpan)
+row.appendChild(valueSpan)
 
         groupContent.appendChild(row)
       })
